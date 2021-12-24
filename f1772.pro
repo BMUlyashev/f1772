@@ -11,11 +11,13 @@ CONFIG += c++11
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    safetester.cpp
+    safetester.cpp \
+    u2270.cpp
 
 HEADERS += \
     mainwindow.h \
-    safetester.h
+    safetester.h \
+    u2270.h
 
 FORMS += \
     mainwindow.ui
