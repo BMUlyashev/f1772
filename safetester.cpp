@@ -8,8 +8,10 @@ SafeTester::SafeTester(){
     m_lowCurrentValue = "0.000";
     m_rampTime = "5.000";
     m_timerTime = "10.000";
+    m_plusChanel = 1;
+    m_minusChanel = 2;
 }
-SafeTester::SafeTester(VoltFunction function, FrequncyACWVoltage frequency, QString voltage,
+SafeTester::SafeTester(int plusChanel, int minusChanel, VoltFunction function, FrequncyACWVoltage frequency, QString voltage,
                        QString hiCurrent, QString lowCurrent, QString rampTime, QString timerTime):
     m_function{function},
     m_frequency{frequency},
@@ -17,13 +19,15 @@ SafeTester::SafeTester(VoltFunction function, FrequncyACWVoltage frequency, QStr
     m_hiCurrentValue{hiCurrent},
     m_lowCurrentValue{lowCurrent},
     m_rampTime{rampTime},
-    m_timerTime{timerTime}
+    m_timerTime{timerTime},
+    m_plusChanel{plusChanel},
+    m_minusChanel{minusChanel}
 {
 
 }
 
 void SafeTester::setVoltFunction(VoltFunction function){m_function = function;}
-QString SafeTester::getVoltFunctionName()
+QString SafeTester::getVoltFunctionName() const
 {
     if(m_function == SafeTester::ACW)
         return "ACW";
@@ -33,7 +37,7 @@ QString SafeTester::getVoltFunctionName()
 }
 
 void SafeTester::setFrequencyACWVoltage(FrequncyACWVoltage frequency){m_frequency = frequency;}
-QString SafeTester::getFrequencyACWVoltage()
+QString SafeTester::getFrequencyACWVoltage() const
 {
     if(m_frequency == FrequncyACWVoltage::FREQ_50HZ)
         return "50";
@@ -51,7 +55,7 @@ void SafeTester::setVoltageValue(double value)
         m_testVoltageValue = "0.050";
     }
 }
-QString SafeTester::getVoltageValue(){return m_testVoltageValue;}
+QString SafeTester::getVoltageValue() const {return m_testVoltageValue;}
 
 
 void SafeTester::setHiCurrentValue(double value)
@@ -61,7 +65,7 @@ void SafeTester::setHiCurrentValue(double value)
     else
         m_hiCurrentValue = "0.001";
 }
-QString SafeTester::getHiCurrentValue(){return m_hiCurrentValue;}
+QString SafeTester::getHiCurrentValue() const {return m_hiCurrentValue;}
 
 void SafeTester::setLowCurrentValue(double value)
 {
@@ -70,7 +74,7 @@ void SafeTester::setLowCurrentValue(double value)
     else
         m_lowCurrentValue = "0.000";
 }
-QString SafeTester::getLowCurrentValue(){return m_lowCurrentValue;}
+QString SafeTester::getLowCurrentValue() const {return m_lowCurrentValue;}
 
 void SafeTester::setRampTime(double value)
 {
@@ -79,7 +83,7 @@ void SafeTester::setRampTime(double value)
     else
         m_rampTime = "0.1";
 }
-QString SafeTester::getRampTime(){return m_rampTime;}
+QString SafeTester::getRampTime() const {return m_rampTime;}
 
 void SafeTester::setTimerTime(double value)
 {
@@ -88,4 +92,20 @@ void SafeTester::setTimerTime(double value)
     else
         m_timerTime = "0.5";
 }
-QString SafeTester::getTimerTime(){return m_timerTime;}
+QString SafeTester::getTimerTime() const {return m_timerTime;}
+
+void SafeTester::setPlusChanel(int value)
+{
+    if (value >= 1)
+        m_plusChanel = value;
+}
+
+int SafeTester::getPlusChanel()const {return m_plusChanel;}
+
+void SafeTester::setMinusChanel(int value)
+{
+    if (value >= 1)
+        m_minusChanel = value;
+}
+
+int SafeTester::getMinusChanel()const {return m_minusChanel;}

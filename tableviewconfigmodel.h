@@ -4,9 +4,13 @@
 #include <QAbstractTableModel>
 #include "safetester.h"
 #include <QString>
+
+#include <QStyledItemDelegate>
+
 class TableViewConfigModel : public QAbstractTableModel
 {
-    enum TableColumnName {
+public:
+   enum TableColumnName {
         COLUMN_STEP,
         COLUMN_PLUS,
         COLUMN_MINUS,
@@ -23,10 +27,31 @@ public:
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
+    Qt::ItemFlags flags(const QModelIndex & index) const;
+    bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
+
 
     void populate(QList<SafeTester> *newValues);
+    void append(SafeTester value);
+    void deleteRow(int idx);
 private:
     QList<SafeTester> *values;
+};
+
+class ChanelDelegate : public QStyledItemDelegate
+{
+    Q_OBJECT
+public:
+    ChanelDelegate(QObject *parent = nullptr);
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
+                          const QModelIndex &index) const;
+
+    void setEditorData(QWidget *editor, const QModelIndex &index) const;
+    void setModelData(QWidget *editor, QAbstractItemModel *model,
+                      const QModelIndex &index) const;
+
+    void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,
+                              const QModelIndex &index) const;
 };
 
 #endif // TABLEVIEWCONFIGMODEL_H

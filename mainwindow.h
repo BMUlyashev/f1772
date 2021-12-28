@@ -4,6 +4,7 @@
 #include <QMainWindow>
 
 #include "safetester.h"
+#include "tableviewconfigmodel.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -22,8 +23,15 @@ private slots:
 
     void on_pushButton_2_clicked();
 
+    void on_pushButton_4_clicked();
+
+    void on_pushButton_5_clicked();
+
 private:
     Ui::MainWindow *ui;
-    SafeTester *tester; // Для отладки
+//    SafeTester *tester; // Для отладки
+    QList<SafeTester> *safeTester;
+    TableViewConfigModel *model;
+
 };
 #endif // MAINWINDOW_H

@@ -8,8 +8,19 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    tester = new SafeTester();
+    model = new TableViewConfigModel();
+    safeTester = new QList<SafeTester>();
 
+    safeTester->append(SafeTester());
+    safeTester->append(SafeTester());
+    safeTester->append(SafeTester());
+    model->populate(safeTester);
+    ui->tableViewConfig->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+//    ui->tableViewConfig->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->tableViewConfig->verticalHeader()->setDefaultSectionSize(15);
+    ui->tableViewConfig->setModel(model);
+    ui->tableViewConfig->setItemDelegateForColumn(TableViewConfigModel::COLUMN_PLUS, new ChanelDelegate(this));
+    ui->tableViewConfig->setItemDelegateForColumn(TableViewConfigModel::COLUMN_MINUS, new ChanelDelegate(this));
 }
 
 MainWindow::~MainWindow()
@@ -20,16 +31,24 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_pushButton_clicked()
 {
-    qDebug() << "tester:-> " << tester->getVoltFunctionName() << " "
-             << tester->getFrequencyACWVoltage() << " "
-             << tester->getVoltageValue();
+
 }
 
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    tester->setFrequencyACWVoltage(SafeTester::FREQ_60HZ);
-    tester->setVoltFunction(SafeTester::DCW);
-    tester->setVoltageValue(0.500);
+
+}
+
+
+void MainWindow::on_pushButton_4_clicked()
+{
+    model->append(SafeTester());
+}
+
+
+void MainWindow::on_pushButton_5_clicked()
+{
+    model->deleteRow(ui->tableViewConfig->currentIndex().row());
 }
 

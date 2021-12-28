@@ -12,11 +12,13 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     safetester.cpp \
+    tableviewconfigmodel.cpp \
     u2270.cpp
 
 HEADERS += \
     mainwindow.h \
     safetester.h \
+    tableviewconfigmodel.h \
     u2270.h
 
 FORMS += \
@@ -28,4 +30,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 DISTFILES += \
-    interface.txt
+    interface.txt \
+    u2270_serial
+

@@ -1,5 +1,6 @@
 #include "tableviewconfigmodel.h"
 #include <QString>
+#include <QSpinBox>
 
 TableViewConfigModel::TableViewConfigModel(QObject *parent) : QAbstractTableModel(parent)
 {
@@ -12,7 +13,7 @@ int TableViewConfigModel::rowCount(const QModelIndex &) const
 }
 int TableViewConfigModel::columnCount(const QModelIndex &) const
 {
-    return 11;
+    return 9;
 }
 QVariant TableViewConfigModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
@@ -79,10 +80,39 @@ QVariant TableViewConfigModel::data(const QModelIndex &index, int role) const
      case Qt::TextAlignmentRole:
         return int(Qt::AlignCenter);
         break;
+    case Qt::UserRole:
+        break;
+//    case Qt::FontRole:
+//       return int(Qt::AlignCenter);
+//       break;
      default:
         break;
     }
     return value;;
+}
+
+Qt::ItemFlags TableViewConfigModel::flags(const QModelIndex &/*index*/) const
+{
+    return Qt::ItemIsSelectable |  Qt::ItemIsEditable | Qt::ItemIsEnabled ;
+}
+
+bool TableViewConfigModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if(role == Qt::EditRole)
+    {
+        if(!checkIndex(index))
+            return false;
+        switch (index.column())
+        {
+            case COLUMN_PLUS:
+                values->operator[](index.row()).setPlusChanel(value.toInt());
+                break;
+            case COLUMN_MINUS:
+                values->operator[](index.row()).setMinusChanel(value.toInt());
+                break;
+        }
+    }
+    return false;
 }
 
 void TableViewConfigModel::populate(QList<SafeTester> *newValues)
@@ -91,4 +121,56 @@ void TableViewConfigModel::populate(QList<SafeTester> *newValues)
     this->beginInsertRows(QModelIndex(),0,idx);
         this->values = newValues;
     endInsertRows();
+}
+
+void TableViewConfigModel::append(SafeTester value)
+{
+    int newRow = this->values->count();
+    beginInsertRows(QModelIndex(), newRow, newRow);
+        values->append(value);
+    endInsertRows();
+}
+
+void TableViewConfigModel::deleteRow(int idx)
+{
+    this->beginRemoveRows(QModelIndex(), idx,idx);
+        (*this->values).removeAt(idx);
+    this->endRemoveRows();
+}
+
+/*==================    Delegates   ======================*/
+
+ChanelDelegate::ChanelDelegate(QObject *parent) : QStyledItemDelegate(parent)
+{}
+
+QWidget *ChanelDelegate::createEditor(QWidget *parent,
+                                       const QStyleOptionViewItem &/* option */,
+                                       const QModelIndex &/* index */) const
+{
+    QSpinBox *editor = new QSpinBox(parent);
+    editor->setFrame(false);
+    editor->setMinimum(1);
+    editor->setMaximum(100);
+    return editor;
+}
+void ChanelDelegate::setEditorData(QWidget *editor,
+                                    const QModelIndex &index) const
+{
+    int value = index.model()->data(index, Qt::DisplayRole).toInt();
+    QSpinBox *spinBox = static_cast<QSpinBox*>(editor);
+    spinBox->setValue(value);
+}
+void ChanelDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
+                                   const QModelIndex &index) const
+{
+    QSpinBox *spinBox = static_cast<QSpinBox*>(editor);
+    spinBox->interpretText();
+    int value = spinBox->value();
+    model->setData(index, value, Qt::EditRole);
+}
+void ChanelDelegate::updateEditorGeometry(QWidget *editor,
+                                           const QStyleOptionViewItem &option,
+                                           const QModelIndex &/* index */) const
+{
+    editor->setGeometry(option.rect);
 }
