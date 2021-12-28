@@ -15,6 +15,7 @@ public:
         COLUMN_PLUS,
         COLUMN_MINUS,
         COLUMN_FUNC,
+        COLUMN_FREQ,
         COLUMN_VOLT,
         COLUMN_HCUR,
         COLUMN_LCUR,
@@ -43,6 +44,38 @@ class ChanelDelegate : public QStyledItemDelegate
     Q_OBJECT
 public:
     ChanelDelegate(QObject *parent = nullptr);
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
+                          const QModelIndex &index) const;
+
+    void setEditorData(QWidget *editor, const QModelIndex &index) const;
+    void setModelData(QWidget *editor, QAbstractItemModel *model,
+                      const QModelIndex &index) const;
+
+    void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,
+                              const QModelIndex &index) const;
+};
+
+class FunctionDelegate : public QStyledItemDelegate
+{
+    Q_OBJECT
+public:
+    FunctionDelegate(QObject *parent = nullptr);
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
+                          const QModelIndex &index) const;
+
+    void setEditorData(QWidget *editor, const QModelIndex &index) const;
+    void setModelData(QWidget *editor, QAbstractItemModel *model,
+                      const QModelIndex &index) const;
+
+    void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,
+                              const QModelIndex &index) const;
+};
+
+class FrequencyDelegate : public QStyledItemDelegate
+{
+    Q_OBJECT
+public:
+    FrequencyDelegate(QObject *parent = nullptr);
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
                           const QModelIndex &index) const;
 

@@ -1,6 +1,7 @@
 #include "tableviewconfigmodel.h"
 #include <QString>
 #include <QSpinBox>
+#include <QComboBox>
 
 TableViewConfigModel::TableViewConfigModel(QObject *parent) : QAbstractTableModel(parent)
 {
@@ -13,7 +14,7 @@ int TableViewConfigModel::rowCount(const QModelIndex &) const
 }
 int TableViewConfigModel::columnCount(const QModelIndex &) const
 {
-    return 9;
+    return 10;
 }
 QVariant TableViewConfigModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
@@ -27,6 +28,8 @@ QVariant TableViewConfigModel::headerData(int section, Qt::Orientation orientati
             return QString("№ Канала\nМинус");
         case COLUMN_FUNC:
             return QString("Тип\nСигнала");
+        case COLUMN_FREQ:
+            return QString("Частота,Гц");
         case COLUMN_VOLT:
             return QString("Напряжение\nПробоя");
         case COLUMN_HCUR:
@@ -59,6 +62,9 @@ QVariant TableViewConfigModel::data(const QModelIndex &index, int role) const
             break;
         case COLUMN_FUNC:
             value = this->values->at(index.row()).getVoltFunctionName();
+            break;
+        case COLUMN_FREQ:
+            value = this->values->at(index.row()).getFrequencyACWVoltage();
             break;
         case COLUMN_VOLT:
             value = this->values->at(index.row()).getVoltageValue();
@@ -110,7 +116,20 @@ bool TableViewConfigModel::setData(const QModelIndex &index, const QVariant &val
             case COLUMN_MINUS:
                 values->operator[](index.row()).setMinusChanel(value.toInt());
                 break;
+            case COLUMN_FUNC:
+                if (value.toString() == "ACW")
+                    values->operator[](index.row()).setVoltFunction(SafeTester::ACW);
+                else if (value.toString() == "DCW")
+                    values->operator[](index.row()).setVoltFunction(SafeTester::DCW);
+                break;
+            case COLUMN_FREQ:
+              if (value.toString() == "50")
+                  values->operator[](index.row()).setFrequencyACWVoltage(SafeTester::FREQ_50HZ);
+              else if (value.toString() == "60")
+                 values->operator[](index.row()).setFrequencyACWVoltage(SafeTester::FREQ_60HZ);
+             break;
         }
+        return true;
     }
     return false;
 }
@@ -174,3 +193,62 @@ void ChanelDelegate::updateEditorGeometry(QWidget *editor,
 {
     editor->setGeometry(option.rect);
 }
+
+/*---------     ComboDeleagte       ---------------*/
+FunctionDelegate::FunctionDelegate(QObject *parent) : QStyledItemDelegate(parent){}
+QWidget *FunctionDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &/*option*/,
+        const QModelIndex &/*index*/) const
+    {
+        QComboBox *editor = new QComboBox(parent);
+        editor->addItem("ACW");
+        editor->addItem("DCW");
+        return editor;
+    }
+void FunctionDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
+    {
+        QString text = index.model()->data(index, Qt::DisplayRole).toString();
+        QComboBox *comboBox = static_cast<QComboBox*>(editor);
+        int tindex = comboBox->findText(text);
+        comboBox->setCurrentIndex(tindex);
+    }
+void FunctionDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
+        const QModelIndex &index) const
+    {
+        QComboBox *comboBox = static_cast<QComboBox*>(editor);
+        QString text = comboBox->currentText();
+        model->setData(index, text, Qt::EditRole);
+    }
+void FunctionDelegate::updateEditorGeometry(QWidget *editor,
+        const QStyleOptionViewItem &option, const QModelIndex &/*index*/) const
+    {
+        editor->setGeometry(option.rect);
+    }
+/*---------     FrequencyDeleagte       ---------------*/
+FrequencyDelegate::FrequencyDelegate(QObject *parent) : QStyledItemDelegate(parent){}
+QWidget *FrequencyDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &/*option*/,
+        const QModelIndex &/*index*/) const
+    {
+        QComboBox *editor = new QComboBox(parent);
+        editor->addItem("50");
+        editor->addItem("60");
+        return editor;
+    }
+void FrequencyDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
+    {
+        QString text = index.model()->data(index, Qt::DisplayRole).toString();
+        QComboBox *comboBox = static_cast<QComboBox*>(editor);
+        int tindex = comboBox->findText(text);
+        comboBox->setCurrentIndex(tindex);
+    }
+void FrequencyDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
+        const QModelIndex &index) const
+    {
+        QComboBox *comboBox = static_cast<QComboBox*>(editor);
+        QString text = comboBox->currentText();
+        model->setData(index, text, Qt::EditRole);
+    }
+void FrequencyDelegate::updateEditorGeometry(QWidget *editor,
+        const QStyleOptionViewItem &option, const QModelIndex &/*index*/) const
+    {
+        editor->setGeometry(option.rect);
+    }
