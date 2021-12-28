@@ -133,6 +133,12 @@ bool TableViewConfigModel::setData(const QModelIndex &index, const QVariant &val
     }
     return false;
 }
+void TableViewConfigModel::clear()
+{
+//    this->beginResetModel();
+//    while
+//    this->endResetModel();
+}
 
 void TableViewConfigModel::populate(QList<SafeTester> *newValues)
 {

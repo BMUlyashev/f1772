@@ -27,6 +27,10 @@ private slots:
 
     void on_pushButton_5_clicked();
 
+    void on_pBtnEditConfigSteps_clicked();
+
+    void on_pBtnNewConfigSteps_clicked();
+
 private:
     Ui::MainWindow *ui;
 //    SafeTester *tester; // Для отладки

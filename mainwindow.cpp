@@ -23,6 +23,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tableViewConfig->setItemDelegateForColumn(TableViewConfigModel::COLUMN_MINUS, new ChanelDelegate(this));
     ui->tableViewConfig->setItemDelegateForColumn(TableViewConfigModel::COLUMN_FUNC, new FunctionDelegate(this));
     ui->tableViewConfig->setItemDelegateForColumn(TableViewConfigModel::COLUMN_FREQ, new FrequencyDelegate(this));
+    ui->pBtnOpenConfigSteps->setEnabled(false);
+    ui->pBtnSaveConfigSteps->setEnabled(false);
+    ui->pBtnAddConfigSteps->setEnabled(false);
 }
 
 MainWindow::~MainWindow()
@@ -52,5 +55,19 @@ void MainWindow::on_pushButton_4_clicked()
 void MainWindow::on_pushButton_5_clicked()
 {
     model->deleteRow(ui->tableViewConfig->currentIndex().row());
+}
+
+
+void MainWindow::on_pBtnEditConfigSteps_clicked()
+{
+    // Надо передать в модель, что разрешено редактирование
+
+}
+
+
+void MainWindow::on_pBtnNewConfigSteps_clicked()
+{
+    // стираем модель и создаем одну запись по умолчанию
+    //model->res
 }
 

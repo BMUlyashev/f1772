@@ -31,7 +31,7 @@ public:
     Qt::ItemFlags flags(const QModelIndex & index) const;
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
 
-
+    void clear();
     void populate(QList<SafeTester> *newValues);
     void append(SafeTester value);
     void deleteRow(int idx);
