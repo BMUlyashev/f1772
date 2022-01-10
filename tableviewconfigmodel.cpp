@@ -135,9 +135,9 @@ bool TableViewConfigModel::setData(const QModelIndex &index, const QVariant &val
 }
 void TableViewConfigModel::clear()
 {
-//    this->beginResetModel();
-//    while
-//    this->endResetModel();
+    this->beginResetModel();
+
+    this->endResetModel();
 }
 
 void TableViewConfigModel::populate(QList<SafeTester> *newValues)
@@ -258,3 +258,12 @@ void FrequencyDelegate::updateEditorGeometry(QWidget *editor,
     {
         editor->setGeometry(option.rect);
     }
+
+/*---------     readOnly Delegate delegate       ---------------*/
+ReadOnlyDelegate::ReadOnlyDelegate(QObject *parent) : QStyledItemDelegate(parent){}
+QWidget *ReadOnlyDelegate::createEditor(QWidget */*parent*/, const QStyleOptionViewItem &/*option*/,
+         const QModelIndex &/*index*/) const
+{
+    return NULL;
+}
+/*---------     lineEdit delegate       ---------------*/

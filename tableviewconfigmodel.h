@@ -22,6 +22,7 @@ public:
         COLUMN_RAMP,
         COLUMN_TIME,
     };
+   bool isEditable = false;
 public:
     explicit TableViewConfigModel(QObject *parent = nullptr);
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
@@ -85,6 +86,15 @@ public:
 
     void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,
                               const QModelIndex &index) const;
+};
+
+class ReadOnlyDelegate : public QStyledItemDelegate
+{
+    Q_OBJECT
+public:
+    ReadOnlyDelegate(QObject *parent = nullptr);
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
+                          const QModelIndex &index) const;
 };
 
 #endif // TABLEVIEWCONFIGMODEL_H
