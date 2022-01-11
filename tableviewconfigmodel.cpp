@@ -2,6 +2,7 @@
 #include <QString>
 #include <QSpinBox>
 #include <QComboBox>
+#include <QLineEdit>
 
 TableViewConfigModel::TableViewConfigModel(QObject *parent) : QAbstractTableModel(parent)
 {
@@ -128,6 +129,21 @@ bool TableViewConfigModel::setData(const QModelIndex &index, const QVariant &val
               else if (value.toString() == "60")
                  values->operator[](index.row()).setFrequencyACWVoltage(SafeTester::FREQ_60HZ);
              break;
+        case COLUMN_VOLT:
+            values->operator[](index.row()).setVoltageValue(value.toDouble());
+            break;
+        case COLUMN_HCUR:
+            values->operator[](index.row()).setHiCurrentValue(value.toDouble());
+            break;
+        case COLUMN_LCUR:
+            values->operator[](index.row()).setLowCurrentValue(value.toDouble());
+            break;
+        case COLUMN_RAMP:
+            values->operator[](index.row()).setRampTime(value.toDouble());
+            break;
+        case COLUMN_TIME:
+            values->operator[](index.row()).setTimerTime(value.toDouble());
+            break;
         }
         return true;
     }
@@ -267,3 +283,37 @@ QWidget *ReadOnlyDelegate::createEditor(QWidget */*parent*/, const QStyleOptionV
     return NULL;
 }
 /*---------     lineEdit delegate       ---------------*/
+ValueDelegate::ValueDelegate(QObject *parent) : QStyledItemDelegate(parent){}
+
+QWidget *ValueDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &/*option*/,
+                                     const QModelIndex &/*index*/) const
+{
+//    QString text = index.model()->data(index, Qt::DisplayRole).toString();
+    QLineEdit *editor = new QLineEdit(parent);
+//    QDoubleValidator* validator =  new QDoubleValidator( 0.000, 100.0, 3 );
+//    validator->setNotation(QDoubleValidator::StandardNotation);
+//    editor->setValidator(validator);
+    // QRegExp
+    //editor->setText(text);
+    return  editor;
+}
+
+void ValueDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
+{
+    QString text = index.model()->data(index, Qt::DisplayRole).toString();
+    QLineEdit *lineEdit = static_cast<QLineEdit*>(editor);
+    lineEdit->setText(text);
+}
+void ValueDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
+        const QModelIndex &index) const
+    {
+        QLineEdit *lineEdit = static_cast<QLineEdit*>(editor);
+        QString text = lineEdit->text();
+        text = text.replace(',', '.');
+        model->setData(index, text, Qt::EditRole);
+    }
+void ValueDelegate::updateEditorGeometry(QWidget *editor,
+        const QStyleOptionViewItem &option, const QModelIndex &/*index*/) const
+    {
+        editor->setGeometry(option.rect);
+    }
