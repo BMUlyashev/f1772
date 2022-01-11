@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include <QDebug>
+#include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -92,5 +93,24 @@ void MainWindow::on_pBtnAddConfigSteps_clicked()
             model->append(SafeTester());
         }
     }
+}
+
+void MainWindow::saveModelData()
+{
+
+}
+
+void MainWindow::on_pBtnSaveConfigSteps_clicked()
+{
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                                    "Сохранение конфигурации",
+                                                    ".",
+                                                    "Xml files (*.xml)");
+    if(fileName != "")
+    {
+        // saving
+        saveModelData();
+    }
+
 }
 

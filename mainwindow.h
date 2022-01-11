@@ -19,6 +19,8 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    // Save model data in xml file
+    void saveModelData();
 private slots:
 
     void on_pBtnEditConfigSteps_clicked();
@@ -26,6 +28,8 @@ private slots:
     void on_pBtnNewConfigSteps_clicked();
 
     void on_pBtnAddConfigSteps_clicked();
+
+    void on_pBtnSaveConfigSteps_clicked();
 
 private:
     Ui::MainWindow *ui;
