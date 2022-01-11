@@ -22,7 +22,7 @@ QVariant TableViewConfigModel::headerData(int section, Qt::Orientation orientati
     if (role == Qt::DisplayRole && orientation == Qt::Horizontal) {
         switch (section) {
         case COLUMN_STEP:
-            return QString("Шаг");
+            return QString("Шаг №");
         case COLUMN_PLUS:
             return QString("№ Канала\nПлюс");
         case COLUMN_MINUS:
@@ -32,15 +32,15 @@ QVariant TableViewConfigModel::headerData(int section, Qt::Orientation orientati
         case COLUMN_FREQ:
             return QString("Частота,Гц");
         case COLUMN_VOLT:
-            return QString("Напряжение\nПробоя");
+            return QString("Напряжение\nПробоя,кВ");
         case COLUMN_HCUR:
-            return QString("HI SET");
+            return QString("HiSET,mA");
         case COLUMN_LCUR:
-            return QString("LO SET");
+            return QString("LoSET,mA");
         case COLUMN_RAMP:
-            return QString("RAMP");
+            return QString("Время\nНарастания,с");
         case COLUMN_TIME:
-            return QString("TIMER");
+            return QString("Время\nВыдержки,с");
         }
     }
     return QVariant();
@@ -152,7 +152,7 @@ bool TableViewConfigModel::setData(const QModelIndex &index, const QVariant &val
 void TableViewConfigModel::clear()
 {
     this->beginResetModel();
-
+    (*this->values).clear();
     this->endResetModel();
 }
 

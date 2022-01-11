@@ -60,6 +60,9 @@ void MainWindow::on_pBtnNewConfigSteps_clicked()
     if (ui->pBtnNewConfigSteps->text() == "Новый")
     {
         // Стираем все данные и добавляем одну строчку
+        model->clear();
+        model->append(SafeTester());
+
     } else if (ui->pBtnNewConfigSteps->text() == "Подтвердить")
     {
         // Просто выходим и активируем кнопки
@@ -71,6 +74,23 @@ void MainWindow::on_pBtnNewConfigSteps_clicked()
         ui->pBtnNewConfigSteps->setText("Новый");
         ui->pBtnLoadConfigToTest->setEnabled(true);
 
+    }
+}
+
+
+void MainWindow::on_pBtnAddConfigSteps_clicked()
+{
+    // открываем окно добавления новых точек
+   AddStepWindow addStepWindow(this);
+   addStepWindow.setModal(true);
+//   addStepWindow.exec();
+    if (addStepWindow.exec())
+    {
+        qDebug() << QString("Your add %1 step").arg(addStepWindow.getCountValue());
+        for (int count = 0; count < addStepWindow.getCountValue(); ++count)
+        {
+            model->append(SafeTester());
+        }
     }
 }
 
