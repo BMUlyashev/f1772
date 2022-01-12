@@ -11,7 +11,7 @@
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
 #include <QXmlStreamAttribute>
-
+#include <QMessageBox>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -27,6 +27,7 @@ public:
 
     // Save model data in xml file
     void saveModelData(QString fileName);
+    void loadModelData(QString fileName);
 private slots:
 
     void on_pBtnEditConfigSteps_clicked();
@@ -36,6 +37,8 @@ private slots:
     void on_pBtnAddConfigSteps_clicked();
 
     void on_pBtnSaveConfigSteps_clicked();
+
+    void on_pBtnOpenConfigSteps_clicked();
 
 private:
     Ui::MainWindow *ui;

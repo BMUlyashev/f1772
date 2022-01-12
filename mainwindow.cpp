@@ -30,7 +30,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tableViewConfig->setItemDelegateForColumn(TableViewConfigModel::COLUMN_HCUR, new ValueDelegate(this));
     ui->tableViewConfig->setItemDelegateForColumn(TableViewConfigModel::COLUMN_LCUR, new ValueDelegate(this));
     ui->tableViewConfig->setItemDelegateForColumn(TableViewConfigModel::COLUMN_TIME, new ValueDelegate(this));
-    ui->pBtnOpenConfigSteps->setEnabled(false);
+    ui->pBtnOpenConfigSteps->setEnabled(true);
     ui->pBtnSaveConfigSteps->setEnabled(false);
     ui->pBtnAddConfigSteps->setEnabled(false);
     ui->tableViewConfig->setEditTriggers(QAbstractItemView::NoEditTriggers);
@@ -138,5 +138,70 @@ void MainWindow::on_pBtnSaveConfigSteps_clicked()
         saveModelData(fileName);
     }
 
+}
+
+void MainWindow::loadModelData(QString fileName)
+{
+    QFile file(fileName);
+    if (!file.open(QFile::ReadOnly | QFile::Text))
+    {
+        QMessageBox::warning(this, "Ошибка файла", "Не удалось открыть файл", QMessageBox::Ok);
+    } else
+    {
+        // reading configuration
+        model->clear(); // clear model
+        QString step, plus, minus, func, freq, volt, lcur, hcur, rampt, timet;
+        QXmlStreamReader xmlReader;
+        xmlReader.setDevice(&file);
+        xmlReader.readNext();
+        while(!xmlReader.atEnd())
+        {
+            if (xmlReader.isStartElement())
+            {
+                if(xmlReader.name() == "step")
+                {
+                    // parsing data to model
+                    foreach(const QXmlStreamAttribute &attr, xmlReader.attributes())
+                    {
+                        if(attr.name().toString() == "n"){step = attr.value().toString();}
+                        if(attr.name().toString() == "plus"){plus = attr.value().toString();}
+                        if(attr.name().toString() == "minus"){minus = attr.value().toString();}
+                        if(attr.name().toString() == "func"){func = attr.value().toString();}
+                        if(attr.name().toString() == "freq"){freq = attr.value().toString();}
+                        if(attr.name().toString() == "volt"){volt = attr.value().toString();}
+                        if(attr.name().toString() == "hcur"){hcur = attr.value().toString();}
+                        if(attr.name().toString() == "lcur"){lcur = attr.value().toString();}
+                        if(attr.name().toString() == "rampt"){rampt = attr.value().toString();}
+                        if(attr.name().toString() == "timet"){timet = attr.value().toString();}
+                    }
+                    qDebug() << "Step =" << step << "PlusCh =" << plus << "Minus =" << minus <<
+                                "Func =" << func << "Freq =" << freq << "Volt =" << volt <<
+                                "LCur =" << lcur << "HCur =" << hcur <<
+                                "Hold Time =" << timet << "Rise Time =" << rampt;
+//                    model->append(SafeTester(plus, minus,))
+                    SafeTester tmpTester;
+                    tmpTester.setPlusChanel(plus.toInt());
+                    tmpTester.setMinusChanel(minus.toInt());
+                    tmpTester.setVoltFunction(func == "DCW" ? SafeTester::DCW : SafeTester::ACW);
+                    tmpTester.setFrequencyACWVoltage(freq == "60" ? SafeTester::FREQ_60HZ : SafeTester::FREQ_50HZ);
+                    tmpTester.setLowCurrentValue(lcur.toDouble());
+                    tmpTester.setHiCurrentValue(hcur.toDouble());
+                    tmpTester.setRampTime(rampt.toDouble());
+                    tmpTester.setTimerTime(timet.toDouble());
+                    model->append(tmpTester);
+                }
+            }
+            xmlReader.readNext();
+        }
+        file.close();
+    }
+
+
+}
+void MainWindow::on_pBtnOpenConfigSteps_clicked()
+{
+    QString fileName = QFileDialog::getOpenFileName(this, "Открыть конфигурацию", ".",
+                                                    "Xml files (*.xml)");
+    if (fileName != ""){loadModelData(fileName);}
 }
 
