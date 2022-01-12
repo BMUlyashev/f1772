@@ -2,7 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include <QDebug>
-#include <QFileDialog>
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -95,21 +95,47 @@ void MainWindow::on_pBtnAddConfigSteps_clicked()
     }
 }
 
-void MainWindow::saveModelData()
+void MainWindow::saveModelData(QString fileName)
 {
+    // open the file for writing
+    QFile file(fileName);
+    file.open(QIODevice::WriteOnly);
+    QXmlStreamWriter xmlWriter(&file);
+    xmlWriter.setAutoFormatting(true);
+    xmlWriter.writeStartDocument();
+    xmlWriter.writeStartElement("configuration");   // Write the first element of his name
 
+    qDebug() << model->rowCount();
+    for (int count = 0; count < model->rowCount() ; ++count)
+    {
+//        qDebug() << model->index(count, 2).data().toString();
+        xmlWriter.writeStartElement("step");
+        xmlWriter.writeAttribute("n", model->index(count, TableViewConfigModel::COLUMN_STEP).data().toString());
+        xmlWriter.writeAttribute("plus", model->index(count, TableViewConfigModel::COLUMN_PLUS).data().toString());
+        xmlWriter.writeAttribute("minus", model->index(count, TableViewConfigModel::COLUMN_MINUS).data().toString());
+        xmlWriter.writeAttribute("func", model->index(count, TableViewConfigModel::COLUMN_FUNC).data().toString());
+        xmlWriter.writeAttribute("freq", model->index(count, TableViewConfigModel::COLUMN_FREQ).data().toString());
+        xmlWriter.writeAttribute("volt", model->index(count, TableViewConfigModel::COLUMN_VOLT).data().toString());
+        xmlWriter.writeAttribute("lcur", model->index(count, TableViewConfigModel::COLUMN_LCUR).data().toString());
+        xmlWriter.writeAttribute("hcur", model->index(count, TableViewConfigModel::COLUMN_HCUR).data().toString());
+        xmlWriter.writeAttribute("rampt", model->index(count, TableViewConfigModel::COLUMN_RAMP).data().toString());
+        xmlWriter.writeAttribute("timet", model->index(count, TableViewConfigModel::COLUMN_TIME).data().toString());
+        xmlWriter.writeEndElement();        // Закрываем тег
+    }
+    xmlWriter.writeEndElement();                    // End element configuration
+    xmlWriter.writeEndDocument();
+    file.close();
 }
 
 void MainWindow::on_pBtnSaveConfigSteps_clicked()
 {
-    QString fileName = QFileDialog::getSaveFileName(this,
-                                                    "Сохранение конфигурации",
-                                                    ".",
+    QString fileName = QFileDialog::getSaveFileName(this, "Сохранение конфигурации", ".",
                                                     "Xml files (*.xml)");
     if(fileName != "")
     {
         // saving
-        saveModelData();
+        qDebug() << "Saving into " << fileName;
+        saveModelData(fileName);
     }
 
 }

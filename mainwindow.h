@@ -7,6 +7,12 @@
 #include "tableviewconfigmodel.h"
 #include "addstepwindow.h"
 
+#include <QFileDialog>
+#include <QXmlStreamWriter>
+#include <QXmlStreamReader>
+#include <QXmlStreamAttribute>
+
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -20,7 +26,7 @@ public:
     ~MainWindow();
 
     // Save model data in xml file
-    void saveModelData();
+    void saveModelData(QString fileName);
 private slots:
 
     void on_pBtnEditConfigSteps_clicked();
