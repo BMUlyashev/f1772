@@ -9,6 +9,20 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    lblStatus = new QLabel(this);
+    lblStatusTester = new QLabel(this);
+    lblStatusU2270 = new QLabel(this);
+    barStatus = new QProgressBar(this);
+
+    ui->statusbar->addWidget(lblStatusTester);
+    ui->statusbar->addWidget(lblStatusU2270);
+    ui->statusbar->addWidget(lblStatus);
+    ui->statusbar->addWidget(barStatus, 1);
+    lblStatusTester->setText("Подключение GPT-79803");
+    lblStatusU2270->setText("Подключение У2270");
+    lblStatus->setText("Ожиданеи");
+
     model = new TableViewConfigModel();
     safeTester = new QList<SafeTester>();
 
@@ -34,6 +48,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->pBtnSaveConfigSteps->setEnabled(false);
     ui->pBtnAddConfigSteps->setEnabled(false);
     ui->tableViewConfig->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+
 }
 
 MainWindow::~MainWindow()
@@ -203,5 +219,19 @@ void MainWindow::on_pBtnOpenConfigSteps_clicked()
     QString fileName = QFileDialog::getOpenFileName(this, "Открыть конфигурацию", ".",
                                                     "Xml files (*.xml)");
     if (fileName != ""){loadModelData(fileName);}
+}
+
+
+void MainWindow::on_actionSerialPort_triggered()
+{
+    SerialPortWindow serialPortWindow(this);
+    serialPortWindow.setModal(true);
+    if(serialPortWindow.exec() == QDialog::Accepted)
+    {
+        // Занимаем порты и выводим информацию статубар
+
+    }
+
+
 }
 

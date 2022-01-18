@@ -7,11 +7,18 @@
 #include "tableviewconfigmodel.h"
 #include "addstepwindow.h"
 
+#include "serialportwindow.h"
+
+#include "devicetester.h"
+
 #include <QFileDialog>
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
 #include <QXmlStreamAttribute>
 #include <QMessageBox>
+#include <QProgressBar>
+#include <QLabel>
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -40,12 +47,19 @@ private slots:
 
     void on_pBtnOpenConfigSteps_clicked();
 
+    void on_actionSerialPort_triggered();
+
 private:
     Ui::MainWindow *ui;
+
+    QLabel *lblStatusTester;
+    QLabel *lblStatusU2270;
+    QLabel *lblStatus;
+    QProgressBar *barStatus;
 //    SafeTester *tester; // Для отладки
     QList<SafeTester> *safeTester;
     TableViewConfigModel *model;
-
+//    CommunicationDevice *tester;
 
 };
 #endif // MAINWINDOW_H
