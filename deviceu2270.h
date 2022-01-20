@@ -15,12 +15,16 @@ public:
     bool deviceReadInfo(QByteArray &answer);
     bool deviceOpenSerial();
     void deviceCloseSerial();
+
+    QString getPortName();
+
 private slots:
 
 private:
     QSerialPort m_deviceU2270;
     QByteArray m_response;
 
+    bool m_isConnected;
 
     const QString COMMAND_READ_INFO_U2270 = "*IDN?\r\n";
     QByteArray writeAndRead(QString command, int timeout);

@@ -15,13 +15,17 @@ MainWindow::MainWindow(QWidget *parent)
     lblStatusU2270 = new QLabel(this);
     barStatus = new QProgressBar(this);
 
+    ui->statusbar->setSizeGripEnabled(false);
     ui->statusbar->addWidget(lblStatusTester);
     ui->statusbar->addWidget(lblStatusU2270);
     ui->statusbar->addWidget(lblStatus);
-    ui->statusbar->addWidget(barStatus, 1);
+    ui->statusbar->addWidget(new QLabel(),1);
+    //ui->statusbar-
+    ui->statusbar->addPermanentWidget(barStatus, 2);
     lblStatusTester->setText("Подключение GPT-79803");
     lblStatusU2270->setText("Подключение У2270");
-    lblStatus->setText("Ожиданеи");
+
+    lblStatus->setText("Ожидание");
 
     model = new TableViewConfigModel();
     safeTester = new QList<SafeTester>();

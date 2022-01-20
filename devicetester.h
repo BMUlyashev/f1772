@@ -22,6 +22,7 @@ private:
     QSerialPort m_deviceTester;
     QByteArray m_response;
 
+    bool m_isConnected;
 
     const QString COMMAND_READ_INFO_TESTER = "*IDN?\r\n";
     QByteArray writeAndRead(QString command, int timeout);
