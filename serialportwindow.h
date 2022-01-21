@@ -18,6 +18,7 @@ class SerialPortWindow : public QDialog
 
 public:
     explicit SerialPortWindow(QWidget *parent = nullptr);
+    SerialPortWindow(QWidget *parent, DeviceTester *devTester, DeviceU2270 *devU);
     ~SerialPortWindow();
 
 private slots:

@@ -16,12 +16,12 @@ MainWindow::MainWindow(QWidget *parent)
     barStatus = new QProgressBar(this);
 
     ui->statusbar->setSizeGripEnabled(false);
-    ui->statusbar->addWidget(lblStatusTester);
-    ui->statusbar->addWidget(lblStatusU2270);
+    ui->statusbar->addPermanentWidget(lblStatusTester);
+    ui->statusbar->addPermanentWidget(lblStatusU2270);
     ui->statusbar->addWidget(lblStatus);
-    ui->statusbar->addWidget(new QLabel(),1);
-    //ui->statusbar-
-    ui->statusbar->addPermanentWidget(barStatus, 2);
+    ui->statusbar->addWidget(new QLabel(),3);
+
+    ui->statusbar->addPermanentWidget(barStatus, 1);
     lblStatusTester->setText("Подключение GPT-79803");
     lblStatusU2270->setText("Подключение У2270");
 
@@ -53,18 +53,28 @@ MainWindow::MainWindow(QWidget *parent)
     ui->pBtnAddConfigSteps->setEnabled(false);
     ui->tableViewConfig->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
+    devTester = new DeviceTester();
+    devU = new DeviceU2270();
+    testParamLoad = false;
+    ui->pBtnStart->setEnabled(false);
+    ui->pBtnStop->setEnabled(false);
+    ui->pBtnSaveResult->setEnabled(false);
+    ui->pBtnClearResult->setEnabled(false);
 
+    setupTestTable();
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
+    delete devTester;
+    delete devU;
 }
 
 void MainWindow::on_pBtnEditConfigSteps_clicked()
 {
     // Надо передать в модель, что разрешено редактирование
-
+        testParamLoad = false;
         ui->pBtnEditConfigSteps->setEnabled(false);
         ui->pBtnSaveConfigSteps->setEnabled(true);
         ui->pBtnAddConfigSteps->setEnabled(true);
@@ -228,14 +238,74 @@ void MainWindow::on_pBtnOpenConfigSteps_clicked()
 
 void MainWindow::on_actionSerialPort_triggered()
 {
-    SerialPortWindow serialPortWindow(this);
+    //SerialPortWindow serialPortWindow(this);
+    SerialPortWindow serialPortWindow(this, devTester, devU);
     serialPortWindow.setModal(true);
     if(serialPortWindow.exec() == QDialog::Accepted)
     {
-        // Занимаем порты и выводим информацию статубар
-
+        // Занимаем порты и выводим информацию статуcбар
+        if(devTester->isConnected())
+            lblStatusTester->setText(QString("GPT-79803 (%1)").arg(devTester->getPortName()));
+        if(devU->isConnected())
+            lblStatusU2270->setText(QString("У2270 (%1)").arg(devU->getPortName()));
+        if (devTester->isConnected() && devU->isConnected())
+        {
+            ui->pBtnStart->setEnabled(true);
+            ui->pBtnSaveResult->setEnabled(true);
+            ui->pBtnClearResult->setEnabled(true);
+        }
     }
 
 
 }
 
+
+void MainWindow::on_pBtnLoadConfigToTest_clicked()
+{
+    // maybe check number of chanell were not equal
+    for (int count = 0; count < model->rowCount() ; ++count)
+    {
+        if(model->index(count, TableViewConfigModel::COLUMN_PLUS).data().toString()  ==
+           model->index(count, TableViewConfigModel::COLUMN_MINUS).data().toString() )
+        {
+            QMessageBox::critical(
+                        this,
+                        "Ошибка",
+                        QString("Одинаковые номера каналов:\nШаг № %1").arg(model->index(count, TableViewConfigModel::COLUMN_STEP).data().toString()));
+        }  else
+        {
+            // unblock buttons on tester screen
+            testParamLoad = true;
+            ui->tabWidget->setCurrentIndex(0);
+        }
+    }
+}
+
+
+void MainWindow::on_pBtnStart_clicked()
+{
+    if(testParamLoad)
+    {
+        // start thread
+    } else
+    {
+        QMessageBox::warning(this, "Внимание", "Параметры тестирования не загружены\nв память!");
+    }
+}
+
+void MainWindow::setupTestTable()
+{
+
+    ui->tableWidget->verticalHeader()->setDefaultSectionSize(15);
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    ui->tableWidget->setColumnCount(10);
+    ui->tableWidget->setColumnWidth(0,15);
+    ui->tableWidget->horizontalHeader()->setVisible(true);
+    ui->tableWidget->setRowCount(1);
+    ui->tableWidget->setHorizontalHeaderLabels(QStringList() << trUtf8("Шаг") << trUtf8("Сигнал") <<
+                                               "Частота, Гц" << "Тестовое\nнапряжение,кВ" << "Ток мин.,мА" <<
+                                               "Ток макс.,мА" << "Время\nнарастания,с" << "Время\nудержания,с" <<
+                                               "Результат" << "Статус");
+    //ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    //ui->tableWidget->
+}

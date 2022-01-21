@@ -18,12 +18,13 @@ public:
 
     QString getPortName();
 
+    bool isConnected();
 private slots:
 
 private:
     QSerialPort m_deviceU2270;
     QByteArray m_response;
-
+    QString m_portName;
     bool m_isConnected;
 
     const QString COMMAND_READ_INFO_U2270 = "*IDN?\r\n";

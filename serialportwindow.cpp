@@ -31,12 +31,38 @@ SerialPortWindow::SerialPortWindow(QWidget *parent) :
     connect(ui->pushButton_3, SIGNAL(clicked()), this, SLOT(reject()));
     connect(ui->pushButton_4, SIGNAL(clicked()), this, SLOT(accept()));
 }
+SerialPortWindow::SerialPortWindow(QWidget *parent, DeviceTester *devTester, DeviceU2270 *devU) :
+    QDialog(parent),
+    ui(new Ui::SerialPortWindow)
+{
+    ui->setupUi(this);
+    foreach(const QSerialPortInfo &info, QSerialPortInfo::availablePorts())
+    {
+        if(!info.isBusy())
+        {
+            ui->comBox_Serial_U2270->addItem(info.portName());
+            ui->comBox_Serial_Tester->addItem(info.portName());
+        }
+    }
+    // Search in settings? if we allready have such names
+    QSettings settings(SETTING_FILE,QSettings::IniFormat);
+    int indx = ui->comBox_Serial_Tester->findText(settings.value(TESTER_PORT_SETTINGS).toString());
+    if (indx != -1)
+        ui->comBox_Serial_Tester->setCurrentIndex(indx);
+    indx = ui->comBox_Serial_U2270->findText(settings.value(U2270_PORT_SETTINGS).toString());
+    if (indx != -1)
+        ui->comBox_Serial_U2270->setCurrentIndex(indx);
+    this->deviceTester = devTester;
+    this->deviceU = devU;
+
+    connect(ui->pushButton_3, SIGNAL(clicked()), this, SLOT(reject()));
+    connect(ui->pushButton_4, SIGNAL(clicked()), this, SLOT(accept()));
+}
+
 
 SerialPortWindow::~SerialPortWindow()
 {
     delete ui;
-    delete  deviceTester;
-    delete  deviceU;
 }
 
 void SerialPortWindow::on_pBtn_Serial_Tester_Test_clicked()
@@ -111,6 +137,7 @@ void SerialPortWindow::on_pushButton_4_clicked()
     if (a)
     {
         qDebug() << "Safe tester GPT-79803 is connected";
+
         QSettings settings(SETTING_FILE,QSettings::IniFormat);
         settings.setValue(TESTER_PORT_SETTINGS, ui->comBox_Serial_Tester->currentText());
 

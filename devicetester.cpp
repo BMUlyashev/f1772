@@ -10,6 +10,7 @@ DeviceTester::DeviceTester(QObject *parent) : QObject(parent)
 void DeviceTester::setPortName(QString serialPortName)
 {
     m_deviceTester.setPortName(serialPortName);
+    m_portName = m_deviceTester.portName();
 }
 
 QByteArray DeviceTester::writeAndRead(QString command, int timeout)
@@ -32,9 +33,11 @@ bool DeviceTester::deviceReadInfo(QByteArray &answer)
     qDebug() <<  " -> " << answer;
     QStringList data = QString(answer).split(',');
     if (data[0] == "GPT-79803")
-        return true;
-    else
-        return false;
+        m_isConnected = true;
+        else
+        m_isConnected = false;
+    return  m_isConnected;
+
 }
 
 bool DeviceTester::deviceOpenSerial()
@@ -45,4 +48,13 @@ void DeviceTester::deviceCloseSerial()
 {
     if(m_deviceTester.isOpen())
         m_deviceTester.close();
+}
+
+bool DeviceTester::isConnected()
+{
+    return m_isConnected;
+}
+QString DeviceTester::getPortName()
+{
+    return m_portName;
 }

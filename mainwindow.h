@@ -10,6 +10,7 @@
 #include "serialportwindow.h"
 
 #include "devicetester.h"
+#include "deviceu2270.h"
 
 #include <QFileDialog>
 #include <QXmlStreamWriter>
@@ -35,6 +36,9 @@ public:
     // Save model data in xml file
     void saveModelData(QString fileName);
     void loadModelData(QString fileName);
+
+private:
+    void setupTestTable();
 private slots:
 
     void on_pBtnEditConfigSteps_clicked();
@@ -49,6 +53,10 @@ private slots:
 
     void on_actionSerialPort_triggered();
 
+    void on_pBtnLoadConfigToTest_clicked();
+
+    void on_pBtnStart_clicked();
+
 private:
     Ui::MainWindow *ui;
 
@@ -60,6 +68,9 @@ private:
     QList<SafeTester> *safeTester;
     TableViewConfigModel *model;
 //    CommunicationDevice *tester;
+    DeviceTester *devTester;
+    DeviceU2270 *devU;
+    bool testParamLoad;
 
 };
 #endif // MAINWINDOW_H

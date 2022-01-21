@@ -9,6 +9,7 @@ DeviceU2270::DeviceU2270(QObject *parent) : QObject(parent)
 void DeviceU2270::setPortName(QString serialPortName)
 {
     m_deviceU2270.setPortName(serialPortName);
+    m_portName = m_deviceU2270.portName();
 }
 
 QByteArray DeviceU2270::writeAndRead(QString command, int timeout)
@@ -30,9 +31,10 @@ bool DeviceU2270::deviceReadInfo(QByteArray &answer)
     qDebug() <<  " -> " << answer;
     QStringList data = QString(answer).split(',');
     if (data[0] == "OMA")
-        return true;
+        m_isConnected = true;
     else
-        return false;
+        m_isConnected = false;
+    return m_isConnected;
 }
 bool DeviceU2270::deviceOpenSerial()
 {
@@ -42,4 +44,13 @@ void DeviceU2270::deviceCloseSerial()
 {
     if(m_deviceU2270.isOpen())
         m_deviceU2270.close();
+}
+
+bool DeviceU2270::isConnected()
+{
+    return m_isConnected;
+}
+QString DeviceU2270::getPortName()
+{
+    return m_portName;
 }

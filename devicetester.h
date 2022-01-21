@@ -16,12 +16,15 @@ public:
     bool deviceReadInfo(QByteArray &answer);
     bool deviceOpenSerial();
     void deviceCloseSerial();
+    bool isConnected();
+    QString getPortName();
+
 private slots:
 
 private:
     QSerialPort m_deviceTester;
     QByteArray m_response;
-
+    QString m_portName;
     bool m_isConnected;
 
     const QString COMMAND_READ_INFO_TESTER = "*IDN?\r\n";
