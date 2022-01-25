@@ -6,8 +6,8 @@ SafeTester::SafeTester(){
     m_testVoltageValue = "0.100";
     m_hiCurrentValue = "1.000";
     m_lowCurrentValue = "0.000";
-    m_rampTime = "5.000";
-    m_timerTime = "10.000";
+    m_rampTime = "5.0";
+    m_timerTime = "10.0";
     m_plusChanel = 1;
     m_minusChanel = 2;
 }
@@ -79,7 +79,7 @@ QString SafeTester::getLowCurrentValue() const {return m_lowCurrentValue;}
 void SafeTester::setRampTime(double value)
 {
     if (value >= MIN_RAMP_TIME && value <= MAX_RAMP_TIME)
-        m_rampTime = QString().number(value, 'f', 3);
+        m_rampTime = QString().number(value, 'f', 1);
     else
         m_rampTime = "0.1";
 }
@@ -88,7 +88,7 @@ QString SafeTester::getRampTime() const {return m_rampTime;}
 void SafeTester::setTimerTime(double value)
 {
     if (value >= MIN_TIMER_TIME && value <= MAX_TIMER_TIME)
-        m_timerTime = QString().number(value, 'f', 3);
+        m_timerTime = QString().number(value, 'f', 1);
     else
         m_timerTime = "0.5";
 }

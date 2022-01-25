@@ -16,6 +16,7 @@ QByteArray DeviceU2270::writeAndRead(QString command, int timeout)
 {
     if(m_deviceU2270.isOpen())
     {
+        qDebug() << "Send request << " << command;
         m_deviceU2270.write(command.toUtf8());
         m_deviceU2270.waitForBytesWritten(50);
         this->thread()->msleep(timeout);
@@ -53,4 +54,50 @@ bool DeviceU2270::isConnected()
 QString DeviceU2270::getPortName()
 {
     return m_portName;
+}
+QString DeviceU2270::errosString(int numError)
+{
+    switch (numError) {
+        case U2270_Error::OK:
+            return "OK";
+            break;
+    case U2270_Error::WRONG_ANSWER:
+        return "Wrong answer";
+        break;
+    case U2270_Error::NOT_CONNECTED:
+        return "Not Connected";
+        break;
+    default:
+        return "Amknown Error";
+    }
+}
+
+int DeviceU2270::clearOutput(int board)
+{
+    if(m_isConnected)
+    {
+        QByteArray answer = writeAndRead(QString("%1 ").arg(board) + COMMAND_CLEAR_U2270, 200);
+        if (QString(answer) == "OK\r\n")
+            return U2270_Error::OK;
+        else
+            return U2270_Error::WRONG_ANSWER;
+    } else
+    {
+        return U2270_Error::NOT_CONNECTED;
+    }
+}
+
+int DeviceU2270::setChanelForSignal(int board, int chanel, QString typeSignal)
+{
+    if(m_isConnected)
+    {
+         QByteArray answer = writeAndRead(COMMAND_EXAMPE_U2270.arg(board).arg(chanel).arg(typeSignal), 200);
+         if (QString(answer) == "OK\r\n")
+             return U2270_Error::OK;
+         else
+             return U2270_Error::WRONG_ANSWER;
+    } else
+    {
+        return U2270_Error::NOT_CONNECTED;
+    }
 }

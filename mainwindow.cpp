@@ -14,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     lblStatusTester = new QLabel(this);
     lblStatusU2270 = new QLabel(this);
     barStatus = new QProgressBar(this);
+    barStatus->setTextVisible(false);
 
     ui->statusbar->setSizeGripEnabled(false);
     ui->statusbar->addPermanentWidget(lblStatusTester);
@@ -62,6 +63,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->pBtnClearResult->setEnabled(false);
 
     setupTestTable();
+    ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    mThread = new TestThread(this, devTester, model, devU);
+    connect(mThread, SIGNAL(finished()), this, SLOT(threadFinished()));
+    connect(mThread, SIGNAL(statusPreparation(int)), this, SLOT(statusStepPreparation(int)));
+    connect(mThread, SIGNAL(statusProgress(int)), this, SLOT(statusProgress(int)));
 }
 
 MainWindow::~MainWindow()
@@ -69,6 +75,7 @@ MainWindow::~MainWindow()
     delete ui;
     delete devTester;
     delete devU;
+    delete mThread;
 }
 
 void MainWindow::on_pBtnEditConfigSteps_clicked()
@@ -287,6 +294,15 @@ void MainWindow::on_pBtnStart_clicked()
     if(testParamLoad)
     {
         // start thread
+        ui->tableWidget->clear();
+        ui->tableWidget->setRowCount(0);
+        ui->tableWidget->setHorizontalHeaderLabels(QStringList() << trUtf8("Шаг") << trUtf8("Канал(+)") << trUtf8("Канал(-)")
+                                                   << trUtf8("Сигнал") << "Частота, Гц" << "Тестовое\nнапряжение,кВ"
+                                                   << "Ток мин.,мА" << "Ток макс.,мА" << "Время\nнарастания,с"
+                                                   << "Время\nудержания,с" << "Результат" << "Статус");
+        ui->pBtnStart->setEnabled(false);
+        barStatus->setValue(0);
+        mThread->start();
     } else
     {
         QMessageBox::warning(this, "Внимание", "Параметры тестирования не загружены\nв память!");
@@ -298,14 +314,51 @@ void MainWindow::setupTestTable()
 
     ui->tableWidget->verticalHeader()->setDefaultSectionSize(15);
     ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    ui->tableWidget->setColumnCount(10);
+    ui->tableWidget->setColumnCount(12);
     ui->tableWidget->setColumnWidth(0,15);
     ui->tableWidget->horizontalHeader()->setVisible(true);
-    ui->tableWidget->setRowCount(1);
-    ui->tableWidget->setHorizontalHeaderLabels(QStringList() << trUtf8("Шаг") << trUtf8("Сигнал") <<
-                                               "Частота, Гц" << "Тестовое\nнапряжение,кВ" << "Ток мин.,мА" <<
-                                               "Ток макс.,мА" << "Время\nнарастания,с" << "Время\nудержания,с" <<
-                                               "Результат" << "Статус");
+    //ui->tableWidget->setRowCount(1);
+    ui->tableWidget->setHorizontalHeaderLabels(QStringList() << trUtf8("Шаг") << trUtf8("Канал(+)") << trUtf8("Канал(-)")
+                                               << trUtf8("Сигнал") << "Частота, Гц" << "Тестовое\nнапряжение,кВ"
+                                               << "Ток мин.,мА" << "Ток макс.,мА" << "Время\nнарастания,с"
+                                               << "Время\nудержания,с" << "Результат" << "Статус");
+
     //ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
     //ui->tableWidget->
+}
+
+void MainWindow::threadFinished()
+{
+    ui->pBtnStart->setEnabled(true);
+}
+
+void MainWindow::statusStepPreparation(int a)
+{
+    ui->tableWidget->insertRow(a);
+    ui->tableWidget->setItem(a, TableViewConfigModel::COLUMN_STEP,
+                             new QTableWidgetItem(model->index(a, TableViewConfigModel::COLUMN_STEP).data().toString()));
+    ui->tableWidget->setItem(a, TableViewConfigModel::COLUMN_PLUS,
+                             new QTableWidgetItem(model->index(a, TableViewConfigModel::COLUMN_PLUS).data().toString()));
+    ui->tableWidget->setItem(a, TableViewConfigModel::COLUMN_MINUS,
+                             new QTableWidgetItem(model->index(a, TableViewConfigModel::COLUMN_MINUS).data().toString()));
+    ui->tableWidget->setItem(a, TableViewConfigModel::COLUMN_FUNC,
+                             new QTableWidgetItem(model->index(a, TableViewConfigModel::COLUMN_FUNC).data().toString()));
+    ui->tableWidget->setItem(a, TableViewConfigModel::COLUMN_FREQ,
+                             new QTableWidgetItem(model->index(a, TableViewConfigModel::COLUMN_FREQ).data().toString()));
+    ui->tableWidget->setItem(a, TableViewConfigModel::COLUMN_VOLT,
+                             new QTableWidgetItem(model->index(a, TableViewConfigModel::COLUMN_VOLT).data().toString()));
+    ui->tableWidget->setItem(a, TableViewConfigModel::COLUMN_LCUR,
+                             new QTableWidgetItem(model->index(a, TableViewConfigModel::COLUMN_LCUR).data().toString()));
+    ui->tableWidget->setItem(a, TableViewConfigModel::COLUMN_HCUR,
+                             new QTableWidgetItem(model->index(a, TableViewConfigModel::COLUMN_HCUR).data().toString()));
+    ui->tableWidget->setItem(a, TableViewConfigModel::COLUMN_RAMP,
+                             new QTableWidgetItem(model->index(a, TableViewConfigModel::COLUMN_RAMP).data().toString()));
+    ui->tableWidget->setItem(a, TableViewConfigModel::COLUMN_TIME,
+                             new QTableWidgetItem(model->index(a, TableViewConfigModel::COLUMN_TIME).data().toString()));
+
+}
+
+void MainWindow::statusProgress(int value)
+{
+    barStatus->setValue(value);
 }

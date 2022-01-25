@@ -17,6 +17,7 @@ SOURCES += \
     safetester.cpp \
     serialportwindow.cpp \
     tableviewconfigmodel.cpp \
+    testthread.cpp \
     u2270.cpp
 
 HEADERS += \
@@ -28,6 +29,7 @@ HEADERS += \
     serialportwindow.h \
     settingsDefine.h \
     tableviewconfigmodel.h \
+    testthread.h \
     u2270.h
 
 FORMS += \

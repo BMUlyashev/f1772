@@ -19,7 +19,7 @@
 #include <QMessageBox>
 #include <QProgressBar>
 #include <QLabel>
-
+#include "testthread.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -42,20 +42,16 @@ private:
 private slots:
 
     void on_pBtnEditConfigSteps_clicked();
-
     void on_pBtnNewConfigSteps_clicked();
-
     void on_pBtnAddConfigSteps_clicked();
-
     void on_pBtnSaveConfigSteps_clicked();
-
     void on_pBtnOpenConfigSteps_clicked();
-
     void on_actionSerialPort_triggered();
-
     void on_pBtnLoadConfigToTest_clicked();
-
     void on_pBtnStart_clicked();
+    void threadFinished();
+    void statusStepPreparation(int); /*Вывод информаци в mainwondow о точках (номер шага)*/
+    void statusProgress(int);       /* for progress bar from thread*/
 
 private:
     Ui::MainWindow *ui;
@@ -71,6 +67,8 @@ private:
     DeviceTester *devTester;
     DeviceU2270 *devU;
     bool testParamLoad;
+    TestThread *mThread;
+
 
 };
 #endif // MAINWINDOW_H

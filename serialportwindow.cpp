@@ -145,7 +145,8 @@ void SerialPortWindow::on_pushButton_4_clicked()
     {
         qDebug() << "Safe tester GPT-79803 is not connected";
     }
-    deviceTester->deviceCloseSerial();
+    //deviceTester->deviceCloseSerial();
+
     deviceU->setPortName(ui->comBox_Serial_U2270->currentText());
     deviceU->deviceOpenSerial();
     QByteArray parcell_U;
@@ -159,7 +160,7 @@ void SerialPortWindow::on_pushButton_4_clicked()
     {
         qDebug() << "U2270 is not connected";
     }
-    deviceU->deviceCloseSerial();
+    //deviceU->deviceCloseSerial();
     if(!(a&&b))
     {
         QMessageBox::critical(this,"Ошибка подключения", "Не удалось подключиться к одному из устройств.\n1. GPT79803\n2. Установка У2270");
