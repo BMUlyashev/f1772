@@ -62,8 +62,10 @@ void SafeTester::setHiCurrentValue(double value)
 {
     if (value >= MIN_HI_CURRENT_VALUE && value <= MAX_HI_CURRENT_VALUE)
         m_hiCurrentValue = QString().number(value, 'f', 3);
-    else
+    else if (value <= MIN_HI_CURRENT_VALUE)
         m_hiCurrentValue = "0.001";
+    else if (value >= MAX_HI_CURRENT_VALUE)
+        m_hiCurrentValue = "42.000";
 }
 QString SafeTester::getHiCurrentValue() const {return m_hiCurrentValue;}
 
@@ -71,8 +73,10 @@ void SafeTester::setLowCurrentValue(double value)
 {
     if (value >= MIN_LOW_CURRENT_VALUE && value <= MAX_LOW_CURRENT_VALUE)
         m_lowCurrentValue = QString().number(value, 'f', 3);
-    else
+    else if (value <= MIN_LOW_CURRENT_VALUE)
         m_lowCurrentValue = "0.000";
+    else if (value >= MAX_LOW_CURRENT_VALUE)
+        m_lowCurrentValue = "0.999";
 }
 QString SafeTester::getLowCurrentValue() const {return m_lowCurrentValue;}
 

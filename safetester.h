@@ -10,7 +10,7 @@
 #define MAX_HI_CURRENT_VALUE    42.0
 #define MIN_HI_CURRENT_VALUE    0.001
 
-#define MAX_LOW_CURRENT_VALUE   41.9
+#define MAX_LOW_CURRENT_VALUE   0.999
 #define MIN_LOW_CURRENT_VALUE   0.0
 
 #define MIN_RAMP_TIME           0.1

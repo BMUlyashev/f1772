@@ -28,7 +28,7 @@ QByteArray DeviceU2270::writeAndRead(QString command, int timeout)
 }
 bool DeviceU2270::deviceReadInfo(QByteArray &answer)
 {
-    answer = writeAndRead(COMMAND_READ_INFO_U2270, 200);
+    answer = writeAndRead(COMMAND_READ_INFO_U2270, 100);
     qDebug() <<  " -> " << answer;
     QStringList data = QString(answer).split(',');
     if (data[0] == "OMA")
@@ -76,7 +76,7 @@ int DeviceU2270::clearOutput(int board)
 {
     if(m_isConnected)
     {
-        QByteArray answer = writeAndRead(QString("%1 ").arg(board) + COMMAND_CLEAR_U2270, 200);
+        QByteArray answer = writeAndRead(QString("%1 ").arg(board) + COMMAND_CLEAR_U2270, 100);
         if (QString(answer) == "OK\r\n")
             return U2270_Error::OK;
         else
@@ -91,7 +91,7 @@ int DeviceU2270::setChanelForSignal(int board, int chanel, QString typeSignal)
 {
     if(m_isConnected)
     {
-         QByteArray answer = writeAndRead(COMMAND_EXAMPE_U2270.arg(board).arg(chanel).arg(typeSignal), 200);
+         QByteArray answer = writeAndRead(COMMAND_EXAMPE_U2270.arg(board).arg(chanel).arg(typeSignal), 100);
          if (QString(answer) == "OK\r\n")
              return U2270_Error::OK;
          else

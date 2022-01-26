@@ -19,6 +19,7 @@ void TestThread::run()
     int plusBoard, minusBoard, plusChanel, minusChanel, plusChanelOnBoard, minusChanelOnBoard;
     int err;
     int countAttemts = 1;
+
     for (int i = 0; i < model->rowCount(); ++i)
     {
 
@@ -34,6 +35,7 @@ void TestThread::run()
                  << "Time=" << model->index(i, TableViewConfigModel::COLUMN_TIME).data().toString() << " ";
         /* Main thread */
         emit statusPreparation(i);
+
         /* Set U2270 for signals*/
 
         plusChanel = model->index(i, TableViewConfigModel::COLUMN_PLUS).data().toInt();
@@ -61,11 +63,27 @@ void TestThread::run()
 
         /* setup tester*/
         bool success = devTester->setFunction(model->index(i, TableViewConfigModel::COLUMN_FUNC).data().toString());
+        /* if ACW -> set frequency*/
+        if(devTester->getSignalFunction() == DeviceTester::ACW)
+            err = devTester->setFrequencyForACW(model->index(i, TableViewConfigModel::COLUMN_FREQ).data().toString());
         /* ramp time*/
         success = devTester->setRampTime(model->index(i, TableViewConfigModel::COLUMN_RAMP).data().toString());
         /*set timer*/
         success = devTester->setTimer(model->index(i, TableViewConfigModel::COLUMN_TIME).data().toString(),
                                       model->index(i, TableViewConfigModel::COLUMN_FUNC).data().toString());
+        /* set low current*/
+        err = devTester->setLowCurrent(model->index(i, TableViewConfigModel::COLUMN_LCUR).data().toString(),
+                                       model->index(i, TableViewConfigModel::COLUMN_FUNC).data().toString());
+        /* set hi current*/
+        err = devTester->setHiCurrent(model->index(i, TableViewConfigModel::COLUMN_HCUR).data().toString(),
+                                       model->index(i, TableViewConfigModel::COLUMN_FUNC).data().toString());
+
+        /* set voltage */
+        err = devTester->setVoltage(model->index(i, TableViewConfigModel::COLUMN_VOLT).data().toString(),
+                                       model->index(i, TableViewConfigModel::COLUMN_FUNC).data().toString());
+
+        /* start teasting*/
+
 
         /* End main thread*/
         this->msleep(2000);
