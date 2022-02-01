@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 
 #include <QDebug>
+#include <QHeaderView>
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -64,18 +65,30 @@ MainWindow::MainWindow(QWidget *parent)
 
     setupTestTable();
     ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    mThread = new TestThread(this, devTester, model, devU);
-    connect(mThread, SIGNAL(finished()), this, SLOT(threadFinished()));
-    connect(mThread, SIGNAL(statusPreparation(int)), this, SLOT(statusStepPreparation(int)));
-    connect(mThread, SIGNAL(statusProgress(int)), this, SLOT(statusProgress(int)));
+
+    qRegisterMetaType<DeviceTester::Measure>("DeviceTester::Measure");
+
+    m_worker = new Worker(0, devTester, devU, model);
+    m_thread = new QThread;
+    m_worker->moveToThread(m_thread);
+    connect(m_worker, SIGNAL(statusPreparation(int)), this, SLOT(statusStepPreparation(int)));
+    connect(m_worker, SIGNAL(finished()), this, SLOT(threadFinished()));
+    connect(m_thread, SIGNAL(started()), m_worker, SLOT(run()));
+    //connect(m_worker, SIGNAL(finished()), m_thread, SLOT(quit()));
+    //connect(m_thread, SIGNAL(finished()), m_thread, SLOT(deleteLater()));
+
+    connect(m_worker, SIGNAL(measure(DeviceTester::Measure)), this, SLOT(statusMeasure(DeviceTester::Measure)));
 }
 
 MainWindow::~MainWindow()
 {
+    //m_workerThread->quit();
+    //m_workerThread->wait();
     delete ui;
     delete devTester;
     delete devU;
-    delete mThread;
+    delete m_worker;
+
 }
 
 void MainWindow::on_pBtnEditConfigSteps_clicked()
@@ -300,9 +313,11 @@ void MainWindow::on_pBtnStart_clicked()
                                                    << trUtf8("Сигнал") << "Частота, Гц" << "Тестовое\nнапряжение,кВ"
                                                    << "Ток мин.,мА" << "Ток макс.,мА" << "Время\nнарастания,с"
                                                    << "Время\nудержания,с" << "Результат" << "Статус");
+//        ui->tableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Fixed);
         ui->pBtnStart->setEnabled(false);
         barStatus->setValue(0);
-        mThread->start();
+//        mThread->start();
+        m_thread->start();
     } else
     {
         QMessageBox::warning(this, "Внимание", "Параметры тестирования не загружены\nв память!");
@@ -313,16 +328,43 @@ void MainWindow::setupTestTable()
 {
 
     ui->tableWidget->verticalHeader()->setDefaultSectionSize(15);
-    ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+//    ui->tableWidget->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Fixed);
+    ui->tableWidget->horizontalHeader()->setStretchLastSection(false);
     ui->tableWidget->setColumnCount(12);
-    ui->tableWidget->setColumnWidth(0,15);
+    ui->tableWidget->setColumnWidth(0,10);
+    ui->tableWidget->setColumnWidth(1, 60);
+    ui->tableWidget->setColumnWidth(2, 60);
+    ui->tableWidget->setColumnWidth(3, 60);
+    ui->tableWidget->setColumnWidth(4, 70);
+    ui->tableWidget->setColumnWidth(5, 90);
+    ui->tableWidget->setColumnWidth(6, 60);
+    ui->tableWidget->setColumnWidth(7, 60);
+    ui->tableWidget->setColumnWidth(8, 80);
+    ui->tableWidget->setColumnWidth(9, 80);
+    ui->tableWidget->setColumnWidth(10, 160);
+
+    ui->tableWidget->setColumnWidth(11, 120);
+//    ui->tableWidget->setColumnWidth(1,25);
+//    ui->tableWidget->setColumnWidth(2,25);
     ui->tableWidget->horizontalHeader()->setVisible(true);
     //ui->tableWidget->setRowCount(1);
     ui->tableWidget->setHorizontalHeaderLabels(QStringList() << trUtf8("Шаг") << trUtf8("Канал(+)") << trUtf8("Канал(-)")
                                                << trUtf8("Сигнал") << "Частота, Гц" << "Тестовое\nнапряжение,кВ"
-                                               << "Ток мин.,мА" << "Ток макс.,мА" << "Время\nнарастания,с"
-                                               << "Время\nудержания,с" << "Результат" << "Статус");
+                                               << "Ток мин.\nмА" << "Ток макс.\nмА" << "Время\nнарастания,с"
+                                               << "Время\nудержания,с" << "Измерения" << "Статус");
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Fixed);
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(1,QHeaderView::Fixed);
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(2,QHeaderView::Fixed);
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(3,QHeaderView::Fixed);
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(4,QHeaderView::Fixed);
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(5,QHeaderView::Fixed);
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(6,QHeaderView::Fixed);
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(7,QHeaderView::Fixed);
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(8,QHeaderView::Fixed);
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(9,QHeaderView::Fixed);
+    ui->tableWidget->horizontalHeader()->setSectionResizeMode(11,QHeaderView::Fixed);
     //ui->tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
     //ui->tableWidget->
 }
@@ -330,11 +372,13 @@ void MainWindow::setupTestTable()
 void MainWindow::threadFinished()
 {
     ui->pBtnStart->setEnabled(true);
+    m_thread->terminate();
 }
 
 void MainWindow::statusStepPreparation(int a)
 {
     ui->tableWidget->insertRow(a);
+    currentRow = a;
     ui->tableWidget->setItem(a, TableViewConfigModel::COLUMN_STEP,
                              new QTableWidgetItem(model->index(a, TableViewConfigModel::COLUMN_STEP).data().toString()));
     ui->tableWidget->setItem(a, TableViewConfigModel::COLUMN_PLUS,
@@ -361,4 +405,18 @@ void MainWindow::statusStepPreparation(int a)
 void MainWindow::statusProgress(int value)
 {
     barStatus->setValue(value);
+}
+void MainWindow::statusMeasure(DeviceTester::Measure data)
+{
+    QString statusTester = "Ожидание";
+    if (data.status == "TEST ")
+        statusTester = "Тестирование";
+    if (data.status == "PASS ")
+        statusTester = "Успешно";
+    if (data.status == "FAIL ")
+        statusTester = "Облом";
+    ui->tableWidget->setItem(currentRow,10,
+                             new QTableWidgetItem(data.voltageValue + " " + data.currentValue));
+    ui->tableWidget->setItem(currentRow,11,
+                             new QTableWidgetItem(statusTester));
 }

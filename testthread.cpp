@@ -11,14 +11,28 @@ TestThread::TestThread(QObject *parent, DeviceTester *devTester, TableViewConfig
     this->devTester = devTester;
     this->model = model;
     this->devU = devU;
+
+    loop = new QEventLoop;
 }
 
+TestThread::~TestThread()
+{
+    delete timerReadInfo;
+    delete timerCheck;
+    delete loop;
+}
 void TestThread::run()
 {
+    timerReadInfo = new QTimer(this);
+    connect(timerReadInfo, SIGNAL(timeout()), this, SLOT(slotTimerReadStatus()));
+    timerCheck = new QTimer(this);
+    timerCheck->setSingleShot(true);
+    connect(timerCheck, SIGNAL(timeout()), this, SLOT(slotCheckEnd()));
     int progress = (100 / model->rowCount());
     int plusBoard, minusBoard, plusChanel, minusChanel, plusChanelOnBoard, minusChanelOnBoard;
     int err;
     int countAttemts = 1;
+
 
     for (int i = 0; i < model->rowCount(); ++i)
     {
@@ -84,7 +98,11 @@ void TestThread::run()
 
         /* start teasting*/
 
-
+        /* start timer read status  and block while testing*/
+        timerReadInfo->start(500);
+        timerCheck->start(3000);
+        /* block while testing*/
+        loop->exec();
         /* End main thread*/
         this->msleep(2000);
         err = devU->clearOutput(plusBoard);   // ToDo add if have not answer
@@ -96,4 +114,20 @@ void TestThread::run()
 
     emit statusProgress(100);
     emit finished();
+}
+
+void TestThread::slotTimerReadStatus()
+{
+    // read status tester and emit signal
+    qDebug() << "Read status from Tester";
+
+}
+
+void TestThread::slotCheckEnd()
+{
+    // after time = rampTime + holdTime
+    // stop timerReadStatus
+    timerReadInfo->stop();
+    qDebug() << "Stop read timer";
+    loop->quit();
 }

@@ -21,6 +21,15 @@ public:
         DCW
     };
 
+    struct Measure {
+        QString typeFunction;
+        QString status;
+        QString voltageValue;
+        QString currentValue;
+        QString time;
+    };
+    Measure m_testValue;
+    //Q_DECLARE_METATYPE(Measure)
     explicit DeviceTester(QObject *parent = nullptr);
     void setPortName(QString serialPortName);
 
@@ -38,6 +47,9 @@ public:
     int setLowCurrent(QString currentValue, QString typeSignal);
     int setHiCurrent(QString currentValue, QString typeSignal);
     int setVoltage(QString voltageValue, QString typeSignal);
+
+    int readMeasure(Measure *tester);
+
     QString getPortName();
 
 private slots:
@@ -80,11 +92,16 @@ private:
     const QString COMMAND_SET_VOLT_DCW_TESTER = QString("MANU:DCW:VOLTage %1\r\n");
     const QString COMMAND_READ_VOLT_DCW_TESTER = QString("MANU:DCW:VOLTage?\r\n");
 
+    const QString COMMAND_READ_STAUS_TESTER = QString("MEASure?\r\n");
+
+    const QString COMMAND_START_TESTER = QString("FUNCtion:TEST ON\r\n");
+    const QString COMMAND_STOP_TESTER = QString("FUNCtion:TEST OFF\r\n");
+
 
     QByteArray writeAndRead(QString command, int timeout);
     void writeCommand(QString command, int timeout);
     void setSignalFunction(QString function);
 
 };
-
+Q_DECLARE_METATYPE(DeviceTester::Measure);
 #endif // DEVICETESTER_H

@@ -18,7 +18,8 @@ SOURCES += \
     serialportwindow.cpp \
     tableviewconfigmodel.cpp \
     testthread.cpp \
-    u2270.cpp
+    u2270.cpp \
+    worker.cpp
 
 HEADERS += \
     addstepwindow.h \
@@ -30,7 +31,8 @@ HEADERS += \
     settingsDefine.h \
     tableviewconfigmodel.h \
     testthread.h \
-    u2270.h
+    u2270.h \
+    worker.h
 
 FORMS += \
     addstepwindow.ui \

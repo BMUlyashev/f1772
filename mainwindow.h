@@ -19,7 +19,10 @@
 #include <QMessageBox>
 #include <QProgressBar>
 #include <QLabel>
-#include "testthread.h"
+//#include "testthread.h"
+#include <QThread>
+
+#include "worker.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -52,7 +55,7 @@ private slots:
     void threadFinished();
     void statusStepPreparation(int); /*Вывод информаци в mainwondow о точках (номер шага)*/
     void statusProgress(int);       /* for progress bar from thread*/
-
+    void statusMeasure(DeviceTester::Measure);
 private:
     Ui::MainWindow *ui;
 
@@ -67,8 +70,9 @@ private:
     DeviceTester *devTester;
     DeviceU2270 *devU;
     bool testParamLoad;
-    TestThread *mThread;
-
+    Worker *m_worker;
+    QThread *m_thread;
+    int currentRow;
 
 };
 #endif // MAINWINDOW_H

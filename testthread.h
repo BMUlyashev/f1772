@@ -3,6 +3,8 @@
 
 #include <QThread>
 #include <QObject>
+#include <QTimer>
+#include <QEventLoop>
 #include "devicetester.h"
 #include "deviceu2270.h"
 #include "tableviewconfigmodel.h"
@@ -13,6 +15,7 @@ class TestThread : public QThread
 public:
 
     explicit TestThread(QObject *parent = nullptr);
+    ~TestThread();
     TestThread(QObject *parent, DeviceTester *devTester, TableViewConfigModel *model, DeviceU2270 *devU);
     void run();
 
@@ -21,17 +24,19 @@ signals:
     void finished();
     void statusPreparation(int);
     void statusProgress(int);
+    void readTester(QString);
 
-
-public slots:
-
+private slots:
+    void slotTimerReadStatus(); // read information about status tester after start every XX ms
+    void slotCheckEnd();
 private:
 //    const DeviceTester *devTester;
     DeviceTester *devTester;
     DeviceU2270 *devU;
     TableViewConfigModel *model;
-
-
+    QTimer *timerReadInfo;
+    QTimer *timerCheck;
+    QEventLoop *loop;
 };
 
 #endif // TESTTHREAD_H

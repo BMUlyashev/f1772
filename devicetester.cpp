@@ -21,6 +21,7 @@ QByteArray DeviceTester::writeAndRead(QString command, int timeout)
 {
     if(m_deviceTester.isOpen())
     {
+        qDebug() << "Send request << " << command;
         m_deviceTester.write(command.toUtf8());
         m_deviceTester.waitForBytesWritten(50);
         this->thread()->msleep(timeout);
@@ -286,6 +287,33 @@ int DeviceTester::setVoltage(QString voltageValue, QString typeSignal)
         if (mValue == voltageValue.toDouble()){
             qDebug() << "Success.";
             status = NO_ERROR;
+        } else {
+            qDebug() << "Fail.";
+            status = WRONG_ANSWER;
+        }
+    } else {
+        qDebug() << "Not connected";
+        status = NOT_CONNECTED;
+    }
+    return status;
+}
+
+int DeviceTester::readMeasure(Measure *tester)
+{
+    int status = NO_ERROR;
+    if(m_isConnected){
+        QByteArray answer;
+        answer = writeAndRead(COMMAND_READ_STAUS_TESTER, 150);
+        qDebug() << QString(answer);
+        // parse answer
+        QStringList list = QString(answer).split(',');
+        if(list.length() == 5){
+            status = NO_ERROR;
+            tester->typeFunction = list.at(0);
+            tester->status = list.at(1);
+            tester->voltageValue = list.at(2);
+            tester->currentValue = list.at(3);
+            tester->time = list.at(4);
         } else {
             qDebug() << "Fail.";
             status = WRONG_ANSWER;
