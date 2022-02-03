@@ -16,7 +16,7 @@ class Worker : public QObject
 public:
     explicit Worker(QObject *parent = nullptr);
     Worker(QObject *parent, DeviceTester *devTester, DeviceU2270 *devU, TableViewConfigModel *model);
-
+    bool m_stop;
 public slots:
         void run();
         void slotTimerReadStatus(); // read information about status tester after start every XX ms
@@ -27,6 +27,7 @@ signals:
     void statusPreparation(int);
     void finished();
     void measure(DeviceTester::Measure);
+    void statusStepProgress(int);
 
 private slots:
 
@@ -38,7 +39,7 @@ private:
     TableViewConfigModel *model;
 //    QTimer *m_timerStatus;
 //    QTimer *m_timerCheck;
-
+    double m_totalTime;    // time for progress on chanel
     QEventLoop loop;
 };
 

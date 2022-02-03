@@ -307,6 +307,7 @@ void MainWindow::on_pBtnStart_clicked()
     if(testParamLoad)
     {
         // start thread
+        m_worker->m_stop = false;
         ui->tableWidget->clear();
         ui->tableWidget->setRowCount(0);
         ui->tableWidget->setHorizontalHeaderLabels(QStringList() << trUtf8("Шаг") << trUtf8("Канал(+)") << trUtf8("Канал(-)")
@@ -318,6 +319,7 @@ void MainWindow::on_pBtnStart_clicked()
         barStatus->setValue(0);
 //        mThread->start();
         m_thread->start();
+        ui->pBtnStop->setEnabled(true);
     } else
     {
         QMessageBox::warning(this, "Внимание", "Параметры тестирования не загружены\nв память!");
@@ -337,11 +339,11 @@ void MainWindow::setupTestTable()
     ui->tableWidget->setColumnWidth(3, 60);
     ui->tableWidget->setColumnWidth(4, 70);
     ui->tableWidget->setColumnWidth(5, 90);
-    ui->tableWidget->setColumnWidth(6, 60);
-    ui->tableWidget->setColumnWidth(7, 60);
+    ui->tableWidget->setColumnWidth(6, 80);
+    ui->tableWidget->setColumnWidth(7, 80);
     ui->tableWidget->setColumnWidth(8, 80);
     ui->tableWidget->setColumnWidth(9, 80);
-    ui->tableWidget->setColumnWidth(10, 160);
+    ui->tableWidget->setColumnWidth(10, 140);
 
     ui->tableWidget->setColumnWidth(11, 120);
 //    ui->tableWidget->setColumnWidth(1,25);
@@ -372,6 +374,7 @@ void MainWindow::setupTestTable()
 void MainWindow::threadFinished()
 {
     ui->pBtnStart->setEnabled(true);
+    ui->pBtnStop->setEnabled(false);
     m_thread->terminate();
 }
 
@@ -381,6 +384,7 @@ void MainWindow::statusStepPreparation(int a)
     currentRow = a;
     ui->tableWidget->setItem(a, TableViewConfigModel::COLUMN_STEP,
                              new QTableWidgetItem(model->index(a, TableViewConfigModel::COLUMN_STEP).data().toString()));
+
     ui->tableWidget->setItem(a, TableViewConfigModel::COLUMN_PLUS,
                              new QTableWidgetItem(model->index(a, TableViewConfigModel::COLUMN_PLUS).data().toString()));
     ui->tableWidget->setItem(a, TableViewConfigModel::COLUMN_MINUS,
@@ -399,7 +403,16 @@ void MainWindow::statusStepPreparation(int a)
                              new QTableWidgetItem(model->index(a, TableViewConfigModel::COLUMN_RAMP).data().toString()));
     ui->tableWidget->setItem(a, TableViewConfigModel::COLUMN_TIME,
                              new QTableWidgetItem(model->index(a, TableViewConfigModel::COLUMN_TIME).data().toString()));
-
+    ui->tableWidget->item(a,TableViewConfigModel::COLUMN_STEP)->setTextAlignment(Qt::AlignCenter);
+    ui->tableWidget->item(a,TableViewConfigModel::COLUMN_PLUS)->setTextAlignment(Qt::AlignCenter);
+    ui->tableWidget->item(a,TableViewConfigModel::COLUMN_MINUS)->setTextAlignment(Qt::AlignCenter);
+    ui->tableWidget->item(a,TableViewConfigModel::COLUMN_FUNC)->setTextAlignment(Qt::AlignCenter);
+    ui->tableWidget->item(a,TableViewConfigModel::COLUMN_FREQ)->setTextAlignment(Qt::AlignCenter);
+    ui->tableWidget->item(a,TableViewConfigModel::COLUMN_VOLT)->setTextAlignment(Qt::AlignCenter);
+    ui->tableWidget->item(a,TableViewConfigModel::COLUMN_LCUR)->setTextAlignment(Qt::AlignCenter);
+    ui->tableWidget->item(a,TableViewConfigModel::COLUMN_HCUR)->setTextAlignment(Qt::AlignCenter);
+    ui->tableWidget->item(a,TableViewConfigModel::COLUMN_RAMP)->setTextAlignment(Qt::AlignCenter);
+    ui->tableWidget->item(a,TableViewConfigModel::COLUMN_TIME)->setTextAlignment(Qt::AlignCenter);
 }
 
 void MainWindow::statusProgress(int value)
@@ -409,14 +422,29 @@ void MainWindow::statusProgress(int value)
 void MainWindow::statusMeasure(DeviceTester::Measure data)
 {
     QString statusTester = "Ожидание";
+
     if (data.status == "TEST ")
         statusTester = "Тестирование";
     if (data.status == "PASS ")
+    {
         statusTester = "Успешно";
-    if (data.status == "FAIL ")
+        data.progress = 100;
+    }
+    if (data.status == "FAIL "){
         statusTester = "Облом";
+        data.progress = 100;
+    }
+//    QProgressBar stepProgress;
     ui->tableWidget->setItem(currentRow,10,
-                             new QTableWidgetItem(data.voltageValue + " " + data.currentValue));
+                             new QTableWidgetItem(data.voltageValue + "     " + data.currentValue));
+    ui->tableWidget->item(currentRow, 10)->setTextAlignment(Qt::AlignCenter);
     ui->tableWidget->setItem(currentRow,11,
-                             new QTableWidgetItem(statusTester));
+                             new QTableWidgetItem(statusTester + "(" + QString::number(data.progress) + ")"));
+    ui->tableWidget->item(currentRow, 11)->setTextAlignment(Qt::AlignCenter);
 }
+
+void MainWindow::on_pBtnStop_clicked()
+{
+    m_worker->m_stop = true;
+}
+

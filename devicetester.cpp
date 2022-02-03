@@ -303,7 +303,7 @@ int DeviceTester::readMeasure(Measure *tester)
     int status = NO_ERROR;
     if(m_isConnected){
         QByteArray answer;
-        answer = writeAndRead(COMMAND_READ_STAUS_TESTER, 150);
+        answer = writeAndRead(COMMAND_READ_STAUS_TESTER, 250);
         qDebug() << QString(answer);
         // parse answer
         QStringList list = QString(answer).split(',');
@@ -314,6 +314,48 @@ int DeviceTester::readMeasure(Measure *tester)
             tester->voltageValue = list.at(2);
             tester->currentValue = list.at(3);
             tester->time = list.at(4);
+        } else {
+            qDebug() << "Fail.";
+            status = WRONG_ANSWER;
+        }
+    } else {
+        qDebug() << "Not connected";
+        status = NOT_CONNECTED;
+    }
+    return status;
+}
+
+int DeviceTester::startTesting(bool enable)
+{
+    int status;
+    QString m_answer = "";
+    if(m_isConnected){
+        // write command
+        //qDebug() <<  "Device Tester -> " << COMMAND_SET_FUNC_TESTER.arg(function);
+
+        QByteArray answer;
+        if (enable){
+            writeCommand(COMMAND_START_TESTER, 10);
+            m_answer = "ON\r\n";
+        }
+        else {
+            writeCommand(COMMAND_STOP_TESTER, 10);
+            m_answer = "OFF\r\n";
+        }// check to enable the command
+        qDebug() <<  "Device Tester -> " << COMMAND_READ_TESTER;
+        answer = writeAndRead(COMMAND_READ_TESTER, 300);
+        qDebug() << QString(answer);    // answer chould be 0.000mA, but time is 10.2
+        QStringList value = QString(answer).split(' ');
+        if (value.length() == 2)
+        {
+            if(value.at(1) == m_answer)
+            {
+                qDebug() << "Success.";
+                status = NO_ERROR;
+            }else{
+                qDebug() << "Fail.";
+                status = WRONG_ANSWER;
+            }
         } else {
             qDebug() << "Fail.";
             status = WRONG_ANSWER;

@@ -56,6 +56,8 @@ private slots:
     void statusStepPreparation(int); /*Вывод информаци в mainwondow о точках (номер шага)*/
     void statusProgress(int);       /* for progress bar from thread*/
     void statusMeasure(DeviceTester::Measure);
+    void on_pBtnStop_clicked();
+
 private:
     Ui::MainWindow *ui;
 

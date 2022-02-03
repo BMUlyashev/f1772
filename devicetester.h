@@ -27,6 +27,7 @@ public:
         QString voltageValue;
         QString currentValue;
         QString time;
+        int progress;
     };
     Measure m_testValue;
     //Q_DECLARE_METATYPE(Measure)
@@ -47,7 +48,7 @@ public:
     int setLowCurrent(QString currentValue, QString typeSignal);
     int setHiCurrent(QString currentValue, QString typeSignal);
     int setVoltage(QString voltageValue, QString typeSignal);
-
+    int startTesting(bool enable);
     int readMeasure(Measure *tester);
 
     QString getPortName();
@@ -96,7 +97,7 @@ private:
 
     const QString COMMAND_START_TESTER = QString("FUNCtion:TEST ON\r\n");
     const QString COMMAND_STOP_TESTER = QString("FUNCtion:TEST OFF\r\n");
-
+    const QString COMMAND_READ_TESTER = QString("FUNCtion:TEST?\r\n");
 
     QByteArray writeAndRead(QString command, int timeout);
     void writeCommand(QString command, int timeout);

@@ -101,3 +101,24 @@ int DeviceU2270::setChanelForSignal(int board, int chanel, QString typeSignal)
         return U2270_Error::NOT_CONNECTED;
     }
 }
+
+int DeviceU2270::getTypeBoard(int boardNumber)
+{
+    if(m_isConnected)
+    {
+        QByteArray answer = writeAndRead(COMMAND_READ_BOARD.arg(boardNumber), 100);
+        QStringList value = QString(answer).split(' ');
+        if (value.length() == 2)
+        {
+            if (value.at(1) == TYPE_BOARD_COM)
+                return U2270_Error::OK;
+            else
+                return U2270_Error::WRONG_ANSWER;
+        } else {
+            return U2270_Error::WRONG_ANSWER;
+        }
+    } else
+    {
+        return U2270_Error::NOT_CONNECTED;
+    }
+}
