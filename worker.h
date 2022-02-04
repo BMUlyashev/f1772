@@ -21,14 +21,14 @@ public slots:
         void run();
         void slotTimerReadStatus(); // read information about status tester after start every XX ms
         void slotCheckEnd();
-
+        void slotTestingFail();
 
 signals:
     void statusPreparation(int);
     void finished();
     void measure(DeviceTester::Measure);
     void statusStepProgress(int);
-
+    void statusFail();
 private slots:
 
 private:

@@ -4,6 +4,7 @@
 #include <QAbstractTableModel>
 #include "safetester.h"
 #include <QString>
+#include <QApplication>
 
 #include <QStyledItemDelegate>
 
@@ -109,6 +110,12 @@ public:
                       const QModelIndex &index) const;
     void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,
                               const QModelIndex &index) const;
+};
+
+class ProgressBarDelegate : public QStyledItemDelegate{
+public:
+    ProgressBarDelegate(QObject *parent = nullptr);
+    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 };
 
 #endif // TABLEVIEWCONFIGMODEL_H

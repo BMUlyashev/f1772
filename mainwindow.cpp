@@ -78,6 +78,7 @@ MainWindow::MainWindow(QWidget *parent)
     //connect(m_thread, SIGNAL(finished()), m_thread, SLOT(deleteLater()));
 
     connect(m_worker, SIGNAL(measure(DeviceTester::Measure)), this, SLOT(statusMeasure(DeviceTester::Measure)));
+    ui->tableWidget->setItemDelegateForColumn(11, new ProgressBarDelegate);
 }
 
 MainWindow::~MainWindow()
@@ -316,6 +317,7 @@ void MainWindow::on_pBtnStart_clicked()
                                                    << "Время\nудержания,с" << "Результат" << "Статус");
 //        ui->tableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Fixed);
         ui->pBtnStart->setEnabled(false);
+        ui->pBtnClearResult->setEnabled(false);
         barStatus->setValue(0);
 //        mThread->start();
         m_thread->start();
@@ -375,6 +377,7 @@ void MainWindow::threadFinished()
 {
     ui->pBtnStart->setEnabled(true);
     ui->pBtnStop->setEnabled(false);
+    ui->pBtnClearResult->setEnabled(true);
     m_thread->terminate();
 }
 
@@ -384,7 +387,6 @@ void MainWindow::statusStepPreparation(int a)
     currentRow = a;
     ui->tableWidget->setItem(a, TableViewConfigModel::COLUMN_STEP,
                              new QTableWidgetItem(model->index(a, TableViewConfigModel::COLUMN_STEP).data().toString()));
-
     ui->tableWidget->setItem(a, TableViewConfigModel::COLUMN_PLUS,
                              new QTableWidgetItem(model->index(a, TableViewConfigModel::COLUMN_PLUS).data().toString()));
     ui->tableWidget->setItem(a, TableViewConfigModel::COLUMN_MINUS,
@@ -403,6 +405,7 @@ void MainWindow::statusStepPreparation(int a)
                              new QTableWidgetItem(model->index(a, TableViewConfigModel::COLUMN_RAMP).data().toString()));
     ui->tableWidget->setItem(a, TableViewConfigModel::COLUMN_TIME,
                              new QTableWidgetItem(model->index(a, TableViewConfigModel::COLUMN_TIME).data().toString()));
+
     ui->tableWidget->item(a,TableViewConfigModel::COLUMN_STEP)->setTextAlignment(Qt::AlignCenter);
     ui->tableWidget->item(a,TableViewConfigModel::COLUMN_PLUS)->setTextAlignment(Qt::AlignCenter);
     ui->tableWidget->item(a,TableViewConfigModel::COLUMN_MINUS)->setTextAlignment(Qt::AlignCenter);
@@ -413,6 +416,16 @@ void MainWindow::statusStepPreparation(int a)
     ui->tableWidget->item(a,TableViewConfigModel::COLUMN_HCUR)->setTextAlignment(Qt::AlignCenter);
     ui->tableWidget->item(a,TableViewConfigModel::COLUMN_RAMP)->setTextAlignment(Qt::AlignCenter);
     ui->tableWidget->item(a,TableViewConfigModel::COLUMN_TIME)->setTextAlignment(Qt::AlignCenter);
+
+    ui->tableWidget->setItem(currentRow,10,
+                             new QTableWidgetItem(QString("0.000kV     0.000 mA")));
+    ui->tableWidget->item(currentRow, 10)->setTextAlignment(Qt::AlignCenter);
+    QTableWidgetItem *item = new QTableWidgetItem("Настройка...");
+    ui->tableWidget->setItem(currentRow, 11, item);
+    ui->tableWidget->item(currentRow, 11)->setTextAlignment(Qt::AlignCenter);
+
+
+
 }
 
 void MainWindow::statusProgress(int value)
@@ -438,13 +451,20 @@ void MainWindow::statusMeasure(DeviceTester::Measure data)
     ui->tableWidget->setItem(currentRow,10,
                              new QTableWidgetItem(data.voltageValue + "     " + data.currentValue));
     ui->tableWidget->item(currentRow, 10)->setTextAlignment(Qt::AlignCenter);
-    ui->tableWidget->setItem(currentRow,11,
-                             new QTableWidgetItem(statusTester + "(" + QString::number(data.progress) + ")"));
-    ui->tableWidget->item(currentRow, 11)->setTextAlignment(Qt::AlignCenter);
+    QTableWidgetItem *item = ui->tableWidget->item(currentRow,11);
+    item->setData(Qt::DisplayRole, QString(statusTester));
+    item->setData(Qt::UserRole, data.progress);
 }
 
 void MainWindow::on_pBtnStop_clicked()
 {
     m_worker->m_stop = true;
+}
+
+
+void MainWindow::on_pBtnClearResult_clicked()
+{
+    ui->tableWidget->clear();
+    setupTestTable();
 }
 

@@ -42,13 +42,20 @@ void Worker::slotTimerReadStatus()
     qDebug() << QString("Time: R=%1 S T=%2 S ").arg(r_time).arg(t_time);
     data.progress = 100 * ((r_time + t_time)/m_totalTime);
     emit measure(data);
-    if(data.status == "PASS ")
+    if(data.status == "FAIL ")
     {
         // stop main timer
+        qDebug() << "Testing FAIL!!!";
+        emit statusFail();
+
     }
 
 }
 
+void Worker::slotTestingFail()
+{
+
+}
 void Worker::slotCheckEnd()
 {
     qDebug() << "Stop read timer";
@@ -160,6 +167,10 @@ void Worker::run()
         connect(&timerWait, SIGNAL(timeout()), &loop, SLOT(quit()));
         connect(&timerWait, SIGNAL(timeout()), this, SLOT(slotCheckEnd()));
         connect(&timerWait, SIGNAL(timeout()), &timerStatus, SLOT(stop()));
+
+        connect(this, SIGNAL(statusFail()), &timerStatus, SLOT(stop()));
+        connect(this, SIGNAL(statusFail()), &timerWait, SLOT(stop()));
+        connect(this, SIGNAL(statusFail()), &loop, SLOT(quit()));
         int waitTime = model->index(i, TableViewConfigModel::COLUMN_TIME).data().toDouble() + model->index(i, TableViewConfigModel::COLUMN_RAMP).data().toDouble();
         timerWait.start(waitTime*1000+1000); // waitTime in seconds, but argument should be in milliseconds
         timerStatus.start(500);

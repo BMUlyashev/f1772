@@ -58,6 +58,8 @@ private slots:
     void statusMeasure(DeviceTester::Measure);
     void on_pBtnStop_clicked();
 
+    void on_pBtnClearResult_clicked();
+
 private:
     Ui::MainWindow *ui;
 
@@ -75,6 +77,7 @@ private:
     Worker *m_worker;
     QThread *m_thread;
     int currentRow;
+    QProgressBar *bar;
 
 };
 #endif // MAINWINDOW_H

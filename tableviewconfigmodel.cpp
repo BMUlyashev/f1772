@@ -3,7 +3,8 @@
 #include <QSpinBox>
 #include <QComboBox>
 #include <QLineEdit>
-
+#include <QPainter>
+#include <QProgressBar>
 TableViewConfigModel::TableViewConfigModel(QObject *parent) : QAbstractTableModel(parent)
 {
     values = new QList<SafeTester>();
@@ -317,3 +318,45 @@ void ValueDelegate::updateEditorGeometry(QWidget *editor,
     {
         editor->setGeometry(option.rect);
     }
+
+ProgressBarDelegate::ProgressBarDelegate(QObject *parent) : QStyledItemDelegate(parent){}
+
+void ProgressBarDelegate::paint(
+        QPainter *painter,
+        const QStyleOptionViewItem &option,
+        const QModelIndex &index)
+const
+{
+    int progress = index.data(Qt::UserRole).toInt();
+    QString text = index.data(Qt::DisplayRole).toString();
+    QStyleOptionProgressBar progressBarOption;
+    QProgressBar progressBar;
+    QRect r = option.rect;
+    QString style;
+    style = "QProgressBar { border: 1px solid black; border-radius: 0px; }";
+    style += "QProgressBar::chunk { background-color: #82ec0c; width: 15px; }";
+    if (text == "Успешно"){
+        style = "QProgressBar { border: 1px solid black; border-radius: 0px; }";
+        style += "QProgressBar::chunk { background-color: #82ec0c; width: 15px; }";
+    }
+    if (text == "Тестирование"){
+        style = "QProgressBar { border: 1px solid black; border-radius: 0px; }";
+        style += "QProgressBar::chunk { background-color: #5ba1e2; width: 15px; }";
+    }
+    if (text == "Облом"){
+        style = "QProgressBar { border: 1px solid black; border-radius: 0px; }";
+        style += "QProgressBar::chunk { background-color: #f44336; width: 15px; }";
+    }
+    progressBar.resize(option.rect.size());
+    progressBar.setMinimum(0);
+    progressBar.setMaximum(100);
+    progressBar.setValue(progress);
+    progressBar.setStyleSheet(style);
+    progressBar.setTextVisible(true);
+    progressBar.setFormat(text);
+    progressBar.setAlignment(Qt::AlignCenter);
+    painter->save();
+    painter->translate(option.rect.topLeft());
+    progressBar.render(painter);
+    painter->restore();
+}
