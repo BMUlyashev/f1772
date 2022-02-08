@@ -19,6 +19,7 @@
 #include <QMessageBox>
 #include <QProgressBar>
 #include <QLabel>
+#include <QCheckBox>
 //#include "testthread.h"
 #include <QThread>
 
@@ -78,6 +79,7 @@ private:
     QThread *m_thread;
     int currentRow;
     QProgressBar *bar;
+    QCheckBox *checkContinue;
 
 };
 #endif // MAINWINDOW_H

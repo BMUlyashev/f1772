@@ -30,6 +30,9 @@ public:
         int progress;
     };
     Measure m_testValue;
+    QString m_deviceName;
+    QString m_deviceSerialNumber;
+
     //Q_DECLARE_METATYPE(Measure)
     explicit DeviceTester(QObject *parent = nullptr);
     void setPortName(QString serialPortName);

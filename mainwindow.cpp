@@ -11,23 +11,28 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    lblStatus = new QLabel(this);
+    //lblStatus = new QLabel(this);
     lblStatusTester = new QLabel(this);
     lblStatusU2270 = new QLabel(this);
     barStatus = new QProgressBar(this);
     barStatus->setTextVisible(false);
+    checkContinue = new QCheckBox(this);
+    checkContinue->setText("Остановить в случае пробоя изоляции");
+    checkContinue->setChecked(true);
+    ui->statusbar->addWidget(checkContinue);
 
     ui->statusbar->setSizeGripEnabled(false);
     ui->statusbar->addPermanentWidget(lblStatusTester);
     ui->statusbar->addPermanentWidget(lblStatusU2270);
-    ui->statusbar->addWidget(lblStatus);
+    //ui->statusbar->addWidget(lblStatus);
     ui->statusbar->addWidget(new QLabel(),3);
+
 
     ui->statusbar->addPermanentWidget(barStatus, 1);
     lblStatusTester->setText("Подключение GPT-79803");
     lblStatusU2270->setText("Подключение У2270");
 
-    lblStatus->setText("Ожидание");
+//    lblStatus->setText("Ожидание");
 
     model = new TableViewConfigModel();
     safeTester = new QList<SafeTester>();
@@ -79,6 +84,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(m_worker, SIGNAL(measure(DeviceTester::Measure)), this, SLOT(statusMeasure(DeviceTester::Measure)));
     ui->tableWidget->setItemDelegateForColumn(11, new ProgressBarDelegate);
+
+
 }
 
 MainWindow::~MainWindow()
@@ -317,6 +324,7 @@ void MainWindow::on_pBtnStart_clicked()
                                                    << "Время\nудержания,с" << "Результат" << "Статус");
 //        ui->tableWidget->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Fixed);
         ui->pBtnStart->setEnabled(false);
+        ui->pBtnSaveResult->setEnabled(false);
         ui->pBtnClearResult->setEnabled(false);
         barStatus->setValue(0);
 //        mThread->start();
@@ -378,6 +386,7 @@ void MainWindow::threadFinished()
     ui->pBtnStart->setEnabled(true);
     ui->pBtnStop->setEnabled(false);
     ui->pBtnClearResult->setEnabled(true);
+    ui->pBtnSaveResult->setEnabled(true);
     m_thread->terminate();
 }
 
@@ -446,6 +455,10 @@ void MainWindow::statusMeasure(DeviceTester::Measure data)
     if (data.status == "FAIL "){
         statusTester = "Облом";
         data.progress = 100;
+        if (checkContinue->isChecked())
+        {
+            m_worker->m_stop = true;
+        }
     }
 //    QProgressBar stepProgress;
     ui->tableWidget->setItem(currentRow,10,
@@ -465,6 +478,7 @@ void MainWindow::on_pBtnStop_clicked()
 void MainWindow::on_pBtnClearResult_clicked()
 {
     ui->tableWidget->clear();
+    ui->tableWidget->setRowCount(0);
     setupTestTable();
 }
 

@@ -333,19 +333,19 @@ const
     QProgressBar progressBar;
     QRect r = option.rect;
     QString style;
-    style = "QProgressBar { border: 1px solid black; border-radius: 0px; }";
+    style = "QProgressBar { border: 0px solid black; border-radius: 0px; }";
     style += "QProgressBar::chunk { background-color: #82ec0c; width: 15px; }";
     if (text == "Успешно"){
-        style = "QProgressBar { border: 1px solid black; border-radius: 0px; }";
-        style += "QProgressBar::chunk { background-color: #82ec0c; width: 15px; }";
+        style = "QProgressBar { border: 0px solid black; border-radius: 0px; }";
+        style += "QProgressBar::chunk { background-color: #a0db8e; width: 15px; }";
     }
     if (text == "Тестирование"){
-        style = "QProgressBar { border: 1px solid black; border-radius: 0px; }";
-        style += "QProgressBar::chunk { background-color: #5ba1e2; width: 15px; }";
+        style = "QProgressBar { border: 0px solid black; border-radius: 0px; }";
+        style += "QProgressBar::chunk { background-color: #c6e2ff; width: 15px; }";
     }
     if (text == "Облом"){
-        style = "QProgressBar { border: 1px solid black; border-radius: 0px; }";
-        style += "QProgressBar::chunk { background-color: #f44336; width: 15px; }";
+        style = "QProgressBar { border: 0px solid black; border-radius: 0px; }";
+        style += "QProgressBar::chunk { background-color: #f08080; width: 15px; }";
     }
     progressBar.resize(option.rect.size());
     progressBar.setMinimum(0);

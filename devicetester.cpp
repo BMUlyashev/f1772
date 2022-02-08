@@ -37,6 +37,11 @@ bool DeviceTester::deviceReadInfo(QByteArray &answer)
     answer = writeAndRead(COMMAND_READ_INFO_TESTER, 200);
     qDebug() <<  " -> " << answer;
     QStringList data = QString(answer).split(',');
+    if (data.length() >= 1)
+    {
+        m_deviceName = data[0];
+        m_deviceSerialNumber = data[1];
+    }
     if (data[0] == "GPT-79803")
         m_isConnected = true;
         else

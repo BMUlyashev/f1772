@@ -15,6 +15,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     safetester.cpp \
+    saveresulttester.cpp \
     serialportwindow.cpp \
     tableviewconfigmodel.cpp \
     testthread.cpp \
@@ -27,6 +28,7 @@ HEADERS += \
     deviceu2270.h \
     mainwindow.h \
     safetester.h \
+    saveresulttester.h \
     serialportwindow.h \
     settingsDefine.h \
     tableviewconfigmodel.h \
@@ -37,6 +39,7 @@ HEADERS += \
 FORMS += \
     addstepwindow.ui \
     mainwindow.ui \
+    saveresulttester.ui \
     serialportwindow.ui
 
 # Default rules for deployment.
@@ -46,6 +49,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 DISTFILES += \
     interface.txt \
+    style \
     u2270_serial
 
 RESOURCES += \

@@ -3,5 +3,11 @@
         <file>img/CircleGreen.png</file>
         <file>img/CircleRed.png</file>
         <file>img/CircleYellow.png</file>
+        <file>img/arrowDown.png</file>
+        <file>img/checkBox.png</file>
+        <file>img/points.png</file>
+    </qresource>
+    <qresource prefix="/style">
+        <file>style</file>
     </qresource>
 </RCC>
