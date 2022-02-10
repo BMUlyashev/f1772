@@ -10,6 +10,7 @@ CONFIG += c++11
 
 SOURCES += \
     addstepwindow.cpp \
+    channelnamemodel.cpp \
     devicetester.cpp \
     deviceu2270.cpp \
     main.cpp \
@@ -24,6 +25,7 @@ SOURCES += \
 
 HEADERS += \
     addstepwindow.h \
+    channelnamemodel.h \
     devicetester.h \
     deviceu2270.h \
     mainwindow.h \

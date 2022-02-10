@@ -10,6 +10,7 @@
 
 class TableViewConfigModel : public QAbstractTableModel
 {
+    Q_OBJECT
 public:
    enum TableColumnName {
         COLUMN_STEP,
@@ -37,6 +38,8 @@ public:
     void populate(QList<SafeTester> *newValues);
     void append(SafeTester value);
     void deleteRow(int idx);
+signals:
+    void modelChanged();
 private:
     QList<SafeTester> *values;
 };

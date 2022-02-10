@@ -5,6 +5,7 @@
 
 #include "safetester.h"
 #include "tableviewconfigmodel.h"
+#include "channelnamemodel.h"
 #include "addstepwindow.h"
 
 #include "serialportwindow.h"
@@ -60,6 +61,7 @@ private slots:
     void on_pBtnStop_clicked();
 
     void on_pBtnClearResult_clicked();
+    void changeSetupModel();
 
 private:
     Ui::MainWindow *ui;
@@ -71,6 +73,7 @@ private:
 //    SafeTester *tester; // Для отладки
     QList<SafeTester> *safeTester;
     TableViewConfigModel *model;
+    ChannelNameModel *modelChanelName;
 //    CommunicationDevice *tester;
     DeviceTester *devTester;
     DeviceU2270 *devU;

@@ -114,9 +114,11 @@ bool TableViewConfigModel::setData(const QModelIndex &index, const QVariant &val
         {
             case COLUMN_PLUS:
                 values->operator[](index.row()).setPlusChanel(value.toInt());
+                emit modelChanged();
                 break;
             case COLUMN_MINUS:
                 values->operator[](index.row()).setMinusChanel(value.toInt());
+                emit modelChanged();
                 break;
             case COLUMN_FUNC:
                 if (value.toString() == "ACW")
@@ -146,6 +148,7 @@ bool TableViewConfigModel::setData(const QModelIndex &index, const QVariant &val
             values->operator[](index.row()).setTimerTime(value.toDouble());
             break;
         }
+
         return true;
     }
     return false;
@@ -171,6 +174,7 @@ void TableViewConfigModel::append(SafeTester value)
     beginInsertRows(QModelIndex(), newRow, newRow);
         values->append(value);
     endInsertRows();
+    emit modelChanged();
 }
 
 void TableViewConfigModel::deleteRow(int idx)
@@ -336,15 +340,15 @@ const
     style = "QProgressBar { border: 0px solid black; border-radius: 0px; }";
     style += "QProgressBar::chunk { background-color: #82ec0c; width: 15px; }";
     if (text == "Успешно"){
-        style = "QProgressBar { border: 0px solid black; border-radius: 0px; }";
+        style = "QProgressBar { border: 0px solid black; border-radius: 0px;color: #000; }";
         style += "QProgressBar::chunk { background-color: #a0db8e; width: 15px; }";
     }
     if (text == "Тестирование"){
-        style = "QProgressBar { border: 0px solid black; border-radius: 0px; }";
-        style += "QProgressBar::chunk { background-color: #c6e2ff; width: 15px; }";
+        style = "QProgressBar { border: 0px solid black; border-radius: 0px;color: #000; }";
+        style += "QProgressBar::chunk { background-color: #c6e2ff; width: 15px;color: #000; }";
     }
     if (text == "Облом"){
-        style = "QProgressBar { border: 0px solid black; border-radius: 0px; }";
+        style = "QProgressBar { border: 0px solid black; border-radius: 0px;color: #000; }";
         style += "QProgressBar::chunk { background-color: #f08080; width: 15px; }";
     }
     progressBar.resize(option.rect.size());

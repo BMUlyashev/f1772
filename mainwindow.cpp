@@ -3,7 +3,7 @@
 
 #include <QDebug>
 #include <QHeaderView>
-
+#include <QPair>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -33,14 +33,30 @@ MainWindow::MainWindow(QWidget *parent)
     lblStatusU2270->setText("Подключение У2270");
 
 //    lblStatus->setText("Ожидание");
-
+    modelChanelName = new ChannelNameModel();
     model = new TableViewConfigModel();
     safeTester = new QList<SafeTester>();
 
+    /* test append modelChanelName*/
+    modelChanelName->append(4, "ADC#0");
+    modelChanelName->append(1, "ADC#0");
+    modelChanelName->append(4, "ADC#0");
+    modelChanelName->append(2, "ADC#0");
+
+    connect(model, SIGNAL(modelChanged()), this, SLOT(changeSetupModel()));
+    //qsort(modelChanelName->data())
+    ui->tableChannelName->setModel(modelChanelName);
+    ui->tableChannelName->verticalHeader()->setDefaultSectionSize(15);
+    ui->tableChannelName->horizontalHeader()->setStretchLastSection(true);
+
+    ui->tableChannelName->horizontalHeader()->setSectionResizeMode(0,QHeaderView::Fixed);
+    ui->tableChannelName->setColumnWidth(0,40);
+    /**/
     safeTester->append(SafeTester());
     safeTester->append(SafeTester());
     safeTester->append(SafeTester());
     model->populate(safeTester);
+
     ui->tableViewConfig->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 //    ui->tableViewConfig->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->tableViewConfig->verticalHeader()->setDefaultSectionSize(15);
@@ -125,6 +141,7 @@ void MainWindow::on_pBtnNewConfigSteps_clicked()
     } else if (ui->pBtnNewConfigSteps->text() == "Подтвердить")
     {
         // Просто выходим и активируем кнопки
+        //  TODO: проверить на совпадение каналов.
         ui->pBtnEditConfigSteps->setEnabled(true);
         ui->pBtnSaveConfigSteps->setEnabled(false);
         ui->pBtnAddConfigSteps->setEnabled(false);
@@ -180,6 +197,7 @@ void MainWindow::saveModelData(QString fileName)
         xmlWriter.writeAttribute("timet", model->index(count, TableViewConfigModel::COLUMN_TIME).data().toString());
         xmlWriter.writeEndElement();        // Закрываем тег
     }
+    // TODO сохранить наименования каналов
     xmlWriter.writeEndElement();                    // End element configuration
     xmlWriter.writeEndDocument();
     file.close();
@@ -300,6 +318,7 @@ void MainWindow::on_pBtnLoadConfigToTest_clicked()
                         this,
                         "Ошибка",
                         QString("Одинаковые номера каналов:\nШаг № %1").arg(model->index(count, TableViewConfigModel::COLUMN_STEP).data().toString()));
+            break;
         }  else
         {
             // unblock buttons on tester screen
@@ -482,3 +501,44 @@ void MainWindow::on_pBtnClearResult_clicked()
     setupTestTable();
 }
 
+void MainWindow::changeSetupModel()
+{
+    qDebug() << "Setup Model changes";
+    /* сохранить старые наименования для каналов*/
+    QVector<QPair<int, QString>> tmpPair;
+    QVector<QString> nameChannels;
+    for(int i = 0; i < modelChanelName->rowCount(); ++i)
+    {
+        tmpPair.append(QPair<int,QString>(modelChanelName->index(i,0).data().toInt(),
+                                          modelChanelName->index(i,1).data().toString()));
+        if (nameChannels.size() <= modelChanelName->index(i,0).data().toInt())
+        {
+            nameChannels.resize(modelChanelName->index(i,0).data().toInt()+1);
+        }
+        nameChannels.replace(modelChanelName->index(i,0).data().toInt(),
+                            modelChanelName->index(i,1).data().toString());
+
+    }
+    modelChanelName->clear();
+    for (int j = 1; j<= 100; ++j)
+    {
+        for (int i = 1; i <= model->rowCount(); ++i)
+        {
+            if((model->index(i-1,TableViewConfigModel::COLUMN_PLUS).data().toInt() == j) ||
+               (model->index(i-1,TableViewConfigModel::COLUMN_MINUS).data().toInt() == j))
+            {
+                qDebug() << QString("Channel %1 is present.").arg(j);
+                if(j < nameChannels.size())
+                {
+                    if(nameChannels.at(j) !="")
+                        modelChanelName->append(j,nameChannels.at(j));
+                    else
+                        modelChanelName->append(j, "Имя канала");
+                } else
+                    modelChanelName->append(j, "Имя канала");
+                break;
+            }
+        }
+
+    }
+}
