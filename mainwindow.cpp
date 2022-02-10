@@ -540,5 +540,5 @@ void MainWindow::changeSetupModel()
             }
         }
 
-    }
+    } // test
 }
