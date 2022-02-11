@@ -38,10 +38,10 @@ MainWindow::MainWindow(QWidget *parent)
     safeTester = new QList<SafeTester>();
 
     /* test append modelChanelName*/
-    modelChanelName->append(4, "ADC#0");
-    modelChanelName->append(1, "ADC#0");
-    modelChanelName->append(4, "ADC#0");
-    modelChanelName->append(2, "ADC#0");
+//    modelChanelName->append(4, "ADC#0");
+//    modelChanelName->append(1, "ADC#0");
+//    modelChanelName->append(4, "ADC#0");
+//    modelChanelName->append(2, "ADC#0");
 
     connect(model, SIGNAL(modelChanged()), this, SLOT(changeSetupModel()));
     ui->tableChannelName->setItemDelegateForColumn(0, new ReadOnlyDelegate);
@@ -55,10 +55,10 @@ MainWindow::MainWindow(QWidget *parent)
     ui->tableChannelName->setColumnWidth(0,40);
     /**/
     safeTester->append(SafeTester());
-    safeTester->append(SafeTester());
-    safeTester->append(SafeTester());
+//    safeTester->append(SafeTester());
+//    safeTester->append(SafeTester());
     model->populate(safeTester);
-
+    changeSetupModel();
     ui->tableViewConfig->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 //    ui->tableViewConfig->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->tableViewConfig->verticalHeader()->setDefaultSectionSize(15);
