@@ -6,6 +6,7 @@
 #include "safetester.h"
 #include "tableviewconfigmodel.h"
 #include "channelnamemodel.h"
+
 #include "addstepwindow.h"
 
 #include "serialportwindow.h"

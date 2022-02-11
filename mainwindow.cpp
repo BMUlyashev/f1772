@@ -44,6 +44,8 @@ MainWindow::MainWindow(QWidget *parent)
     modelChanelName->append(2, "ADC#0");
 
     connect(model, SIGNAL(modelChanged()), this, SLOT(changeSetupModel()));
+    ui->tableChannelName->setItemDelegateForColumn(0, new ReadOnlyDelegate);
+    ui->tableChannelName->setItemDelegateForColumn(1, new NameDelegate(modelChanelName->getStringNames()));
     //qsort(modelChanelName->data())
     ui->tableChannelName->setModel(modelChanelName);
     ui->tableChannelName->verticalHeader()->setDefaultSectionSize(15);
