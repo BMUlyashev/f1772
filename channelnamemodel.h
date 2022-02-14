@@ -27,6 +27,7 @@ public:
     void append(int channelNumber, QString channelName);
     void clear();
     QStringList getStringNames();
+    void setChannelName(int index, QString name);
 public slots:
     void updateChannelName();
 private:

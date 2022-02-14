@@ -183,6 +183,7 @@ void MainWindow::saveModelData(QString fileName)
     xmlWriter.writeStartElement("configuration");   // Write the first element of his name
 
     qDebug() << model->rowCount();
+    xmlWriter.writeStartElement("steps");   // Write the first element of his name
     for (int count = 0; count < model->rowCount() ; ++count)
     {
 //        qDebug() << model->index(count, 2).data().toString();
@@ -199,8 +200,23 @@ void MainWindow::saveModelData(QString fileName)
         xmlWriter.writeAttribute("timet", model->index(count, TableViewConfigModel::COLUMN_TIME).data().toString());
         xmlWriter.writeEndElement();        // Закрываем тег
     }
+    xmlWriter.writeEndElement();
     // TODO сохранить наименования каналов
+    /* save names channels*/
+    xmlWriter.writeStartElement("names");
+        for (int i = 0; i < modelChanelName->rowCount();++i)
+        {
+            xmlWriter.writeStartElement("name");
+            xmlWriter.writeAttribute("channel", modelChanelName->index(i,0).
+                                     data().toString());
+            xmlWriter.writeAttribute("name", modelChanelName->index(i,1).
+                                     data().toString());
+            xmlWriter.writeEndElement();
+        }
+    xmlWriter.writeEndElement();
+    /**/
     xmlWriter.writeEndElement();                    // End element configuration
+
     xmlWriter.writeEndDocument();
     file.close();
 }
@@ -228,7 +244,9 @@ void MainWindow::loadModelData(QString fileName)
     {
         // reading configuration
         model->clear(); // clear model
+//        modelChanelName->clear();
         QString step, plus, minus, func, freq, volt, lcur, hcur, rampt, timet;
+        QString channel, name;
         QXmlStreamReader xmlReader;
         xmlReader.setDevice(&file);
         xmlReader.readNext();
@@ -241,16 +259,16 @@ void MainWindow::loadModelData(QString fileName)
                     // parsing data to model
                     foreach(const QXmlStreamAttribute &attr, xmlReader.attributes())
                     {
-                        if(attr.name().toString() == "n"){step = attr.value().toString();}
-                        if(attr.name().toString() == "plus"){plus = attr.value().toString();}
-                        if(attr.name().toString() == "minus"){minus = attr.value().toString();}
-                        if(attr.name().toString() == "func"){func = attr.value().toString();}
-                        if(attr.name().toString() == "freq"){freq = attr.value().toString();}
-                        if(attr.name().toString() == "volt"){volt = attr.value().toString();}
-                        if(attr.name().toString() == "hcur"){hcur = attr.value().toString();}
-                        if(attr.name().toString() == "lcur"){lcur = attr.value().toString();}
-                        if(attr.name().toString() == "rampt"){rampt = attr.value().toString();}
-                        if(attr.name().toString() == "timet"){timet = attr.value().toString();}
+                        if(attr.name().toString() == "n"){step = attr.value().toString();continue;}
+                        if(attr.name().toString() == "plus"){plus = attr.value().toString();continue;}
+                        if(attr.name().toString() == "minus"){minus = attr.value().toString();continue;}
+                        if(attr.name().toString() == "func"){func = attr.value().toString();continue;}
+                        if(attr.name().toString() == "freq"){freq = attr.value().toString();continue;}
+                        if(attr.name().toString() == "volt"){volt = attr.value().toString();continue;}
+                        if(attr.name().toString() == "hcur"){hcur = attr.value().toString();continue;}
+                        if(attr.name().toString() == "lcur"){lcur = attr.value().toString();continue;}
+                        if(attr.name().toString() == "rampt"){rampt = attr.value().toString();continue;}
+                        if(attr.name().toString() == "timet"){timet = attr.value().toString();continue;}
                     }
                     qDebug() << "Step =" << step << "PlusCh =" << plus << "Minus =" << minus <<
                                 "Func =" << func << "Freq =" << freq << "Volt =" << volt <<
@@ -267,6 +285,26 @@ void MainWindow::loadModelData(QString fileName)
                     tmpTester.setRampTime(rampt.toDouble());
                     tmpTester.setTimerTime(timet.toDouble());
                     model->append(tmpTester);
+                }
+                if(xmlReader.name() == "name")
+                {
+                    qDebug() << "Read names";
+                    foreach(const QXmlStreamAttribute &attr, xmlReader.attributes())
+                    {
+                        if(attr.name().toString() == "channel"){channel = attr.value().toString();continue;}
+                        if(attr.name().toString() == "name"){name = attr.value().toString();continue;}
+                    }
+                    qDebug() << QString("Channel %1 has name %2").arg(channel).arg(name);
+//                    modelChanelName->append(channel.toInt(), name);
+                    /* check the name in model*/
+                    for (int i=0; i < modelChanelName->rowCount();++i)
+                    {
+                        if(modelChanelName->index(i,0).data().toInt() == channel.toInt())
+                        {
+                            modelChanelName->setChannelName(i, name);
+                            break;
+                        }
+                    }
                 }
             }
             xmlReader.readNext();

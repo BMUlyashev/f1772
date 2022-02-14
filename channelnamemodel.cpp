@@ -124,7 +124,10 @@ void ChannelNameModel::updateChannelName()
 {
     clear();
 }
-
+void ChannelNameModel::setChannelName(int index, QString name)
+{
+    values->replace(index,QPair<int, QString>(values->at(index).first, name));
+}
 /*---------     ComboDeleagte       ---------------*/
 NameDelegate::NameDelegate(QStringList list, QObject *parent) : QStyledItemDelegate(parent)
     {
