@@ -582,3 +582,10 @@ void MainWindow::changeSetupModel()
 
     }   // test new
 }
+
+void MainWindow::on_pBtnSaveResult_clicked()
+{
+    /* сохранение отчета после проверки */
+    /* нужно передать в модель все данные */
+}
+

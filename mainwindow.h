@@ -64,6 +64,8 @@ private slots:
     void on_pBtnClearResult_clicked();
     void changeSetupModel();
 
+    void on_pBtnSaveResult_clicked();
+
 private:
     Ui::MainWindow *ui;
 
