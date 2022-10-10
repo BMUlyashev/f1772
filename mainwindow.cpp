@@ -124,7 +124,8 @@ void MainWindow::on_pBtnEditConfigSteps_clicked()
         ui->pBtnEditConfigSteps->setEnabled(false);
         ui->pBtnSaveConfigSteps->setEnabled(true);
         ui->pBtnAddConfigSteps->setEnabled(true);
-        ui->pBtnOpenConfigSteps->setEnabled(false);
+        ui->pBtnOpenConfigSteps->setText("Удалить");
+        //ui->pBtnOpenConfigSteps->setEnabled(false);
         ui->tableViewConfig->setEditTriggers(QAbstractItemView::AllEditTriggers);
         ui->pBtnNewConfigSteps->setText("Подтвердить");
         ui->pBtnLoadConfigToTest->setEnabled(false);
@@ -148,6 +149,7 @@ void MainWindow::on_pBtnNewConfigSteps_clicked()
         ui->pBtnSaveConfigSteps->setEnabled(false);
         ui->pBtnAddConfigSteps->setEnabled(false);
         ui->pBtnOpenConfigSteps->setEnabled(true);
+        ui->pBtnOpenConfigSteps->setText("Открыть");
         ui->tableViewConfig->setEditTriggers(QAbstractItemView::NoEditTriggers);
         ui->pBtnNewConfigSteps->setText("Новый");
         ui->pBtnLoadConfigToTest->setEnabled(true);
@@ -280,6 +282,7 @@ void MainWindow::loadModelData(QString fileName)
                     tmpTester.setMinusChanel(minus.toInt());
                     tmpTester.setVoltFunction(func == "DCW" ? SafeTester::DCW : SafeTester::ACW);
                     tmpTester.setFrequencyACWVoltage(freq == "60" ? SafeTester::FREQ_60HZ : SafeTester::FREQ_50HZ);
+                    tmpTester.setVoltageValue(volt.toDouble());
                     tmpTester.setLowCurrentValue(lcur.toDouble());
                     tmpTester.setHiCurrentValue(hcur.toDouble());
                     tmpTester.setRampTime(rampt.toDouble());
@@ -314,11 +317,20 @@ void MainWindow::loadModelData(QString fileName)
 
 
 }
-void MainWindow::on_pBtnOpenConfigSteps_clicked()
-{
+void MainWindow::on_pBtnOpenConfigSteps_clicked(){
+    if (ui->pBtnOpenConfigSteps->text() == "Открыть") {
+
     QString fileName = QFileDialog::getOpenFileName(this, "Открыть конфигурацию", ".",
                                                     "Xml files (*.xml)");
     if (fileName != ""){loadModelData(fileName);}
+    } else if (ui->pBtnOpenConfigSteps->text() == "Удалить") {
+        // удалим строку выделенную
+        int currentRow = ui->tableViewConfig->currentIndex().row();
+        if (currentRow >= 0) {
+            model->deleteRow(currentRow);
+        }
+
+    }
 }
 
 

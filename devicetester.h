@@ -54,6 +54,8 @@ public:
     int startTesting(bool enable);
     int readMeasure(Measure *tester);
 
+    bool waitForReady(int timeout);
+
     QString getPortName();
 
 private slots:

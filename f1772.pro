@@ -16,6 +16,7 @@ SOURCES += \
     deviceu2270.cpp \
     main.cpp \
     mainwindow.cpp \
+    reportclass.cpp \
     safetester.cpp \
     saveresulttester.cpp \
     serialportwindow.cpp \
@@ -30,6 +31,7 @@ HEADERS += \
     devicetester.h \
     deviceu2270.h \
     mainwindow.h \
+    reportclass.h \
     safetester.h \
     saveresulttester.h \
     serialportwindow.h \
