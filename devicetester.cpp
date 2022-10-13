@@ -42,7 +42,7 @@ QByteArray DeviceTester::writeAndRead(QString command, int timeout)
         m_deviceTester.clear();
         qDebug() << "Send request << " << command;
         numBytes = m_deviceTester.write(command.toUtf8());
-        m_deviceTester.waitForBytesWritten(50);
+        m_deviceTester.waitForBytesWritten(100);
         qDebug() << "Was writen  " << numBytes << ".";
         QByteArray answer;
         QTimer timer;
@@ -51,11 +51,12 @@ QByteArray DeviceTester::writeAndRead(QString command, int timeout)
         connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
         timer.start(timeout);
         loop.exec();
-        m_deviceTester.waitForReadyRead(50);
+        m_deviceTester.waitForReadyRead(200);
         answer = m_deviceTester.readAll();
         if (answer.isEmpty()) {
             qDebug() << "Error serial port: " << m_deviceTester.errorString();
             qDebug() << "Bytes in port" << m_deviceTester.bytesAvailable();
+            m_deviceTester.flush();
             return QByteArray("");
         }
         return answer;
@@ -340,7 +341,7 @@ int DeviceTester::readMeasure(Measure *tester)
     int status = NO_ERROR;
     if(m_isConnected){
         QByteArray answer;
-        answer = writeAndRead(COMMAND_READ_STAUS_TESTER, 150);
+        answer = writeAndRead(COMMAND_READ_STAUS_TESTER, 200);
         qDebug() << QString(answer);
         // parse answer
         QStringList list = QString(answer).split(',');
@@ -381,6 +382,7 @@ int DeviceTester::startTesting(bool enable)
             m_answer = "OFF\r\n";
         }// check to enable the command
         qDebug() <<  "Device Tester -> " << COMMAND_READ_TESTER;
+        this->thread()->msleep(200);
         answer = writeAndRead(COMMAND_READ_TESTER, 200);
         qDebug() << QString(answer);    // answer chould be 0.000mA, but time is 10.2
         QStringList value = QString(answer).split(' ');
