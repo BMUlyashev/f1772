@@ -16,6 +16,9 @@ Worker::Worker(QObject *parent, DeviceTester *devTester, DeviceU2270 *devU, Tabl
     this->devU = devU;
     m_stop = false;
 
+    connect(this, SIGNAL(closeSerial()), devTester, SLOT(closeSerial()));
+    connect(this, SIGNAL(openSerial()), devTester, SLOT(openSerial()));
+
 }
 void Worker::slotTimerReadStatus()
 {

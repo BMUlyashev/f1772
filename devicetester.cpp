@@ -56,8 +56,20 @@ QByteArray DeviceTester::writeAndRead(QString command, int timeout)
         if (answer.isEmpty()) {
             qDebug() << "Error serial port: " << m_deviceTester.errorString();
             qDebug() << "Bytes in port" << m_deviceTester.bytesAvailable();
+            qDebug() << "=======================================================================================================";
+            qDebug() << "=======================================================================================================";
+            qDebug() << "=======================================================================================================";
+            qDebug() << "=======================================================================================================";
+            qDebug() << "=======================================================================================================";
+            qDebug() << "=======================================================================================================";
             m_deviceTester.flush();
-            return QByteArray("");
+            m_deviceTester.clearError();
+          //  emit(closeSerial());
+
+           // emit(openSerial());
+//            m_deviceTester.close();
+//            qDebug() << "Open serial: " << deviceOpenSerial();
+//            return QByteArray("");
         }
         return answer;
     } else {
@@ -81,6 +93,17 @@ bool DeviceTester::deviceReadInfo(QByteArray &answer)
         m_isConnected = false;
     return  m_isConnected;
 
+}
+
+bool DeviceTester::openSerial()
+{
+    return m_deviceTester.open(QIODevice::ReadWrite);
+}
+
+void DeviceTester::closeSerial()
+{
+    if(m_deviceTester.isOpen())
+        m_deviceTester.close();
 }
 
 bool DeviceTester::deviceOpenSerial()

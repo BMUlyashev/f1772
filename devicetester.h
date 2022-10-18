@@ -57,7 +57,9 @@ public:
     bool waitForReady(int timeout);
 
     QString getPortName();
-
+public slots:
+    void closeSerial();
+    bool openSerial();
 private slots:
 
 private:

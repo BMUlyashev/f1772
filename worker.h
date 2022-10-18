@@ -29,6 +29,9 @@ signals:
     void measure(DeviceTester::Measure);
     void statusStepProgress(int);
     void statusFail();
+
+    void closeSerial();
+    void openSerial();
 private slots:
 
 private:
