@@ -7,6 +7,7 @@
         <file>img/checkBox.png</file>
         <file>img/points.png</file>
         <file>img/arrowUp.png</file>
+        <file>img/icon.ico</file>
     </qresource>
     <qresource prefix="/style">
         <file>style</file>

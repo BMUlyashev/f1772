@@ -1,6 +1,7 @@
 QT       += core gui
 QT      += serialport
 QT      += axcontainer
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
@@ -59,4 +60,6 @@ DISTFILES += \
 
 RESOURCES += \
     resource.qrc
+
+RC_ICONS = img/icon.ico
 
