@@ -11,7 +11,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    //lblStatus = new QLabel(this);
+    lblStatus = new QLabel(this);
     lblStatusTester = new QLabel(this);
     lblStatusU2270 = new QLabel(this);
     barStatus = new QProgressBar(this);
@@ -22,9 +22,10 @@ MainWindow::MainWindow(QWidget *parent)
     ui->statusbar->addWidget(checkContinue);
 
     ui->statusbar->setSizeGripEnabled(false);
+     ui->statusbar->addPermanentWidget(lblStatus, 1);
     ui->statusbar->addPermanentWidget(lblStatusTester);
     ui->statusbar->addPermanentWidget(lblStatusU2270);
-    //ui->statusbar->addWidget(lblStatus);
+
     ui->statusbar->addWidget(new QLabel(),3);
 
 
@@ -32,7 +33,8 @@ MainWindow::MainWindow(QWidget *parent)
     lblStatusTester->setText("Подключение GPT-79803");
     lblStatusU2270->setText("Подключение У2270");
 
-//    lblStatus->setText("Ожидание");
+    lblStatus->setText("Ожидание");
+    lblStatus->setAlignment(Qt::AlignCenter);
     modelChanelName = new ChannelNameModel();
     model = new TableViewConfigModel();
     safeTester = new QList<SafeTester>();
@@ -103,7 +105,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(m_worker, SIGNAL(measure(DeviceTester::Measure)), this, SLOT(statusMeasure(DeviceTester::Measure)));
     ui->tableWidget->setItemDelegateForColumn(11, new ProgressBarDelegate);
 
-
+    connect(m_worker, SIGNAL(statusStepProgress(int, int)), this, SLOT(statusProgress(int, int)));
 }
 
 MainWindow::~MainWindow()
@@ -114,6 +116,10 @@ MainWindow::~MainWindow()
     delete devTester;
     delete devU;
     delete m_worker;
+    delete lblStatus;
+    delete lblStatusTester;
+    delete lblStatusU2270;
+    delete barStatus;
 
 }
 
@@ -508,9 +514,17 @@ void MainWindow::statusStepPreparation(int a)
 
 }
 
-void MainWindow::statusProgress(int value)
+void MainWindow::statusProgress(int totalValue, int leftTime)
 {
-    barStatus->setValue(value);
+    barStatus->setMaximum(totalValue);
+//    QString text;
+//    text.sprintf("%02d", totalValue);
+    lblStatus->setText("Осталось " + QString::number((int)leftTime/60).rightJustified(2, '0') + ":" + QString::number((int)leftTime%60).rightJustified(2, '0'));
+    barStatus->setFormat("Осталось " + QString::number((int)leftTime/60) + ":" + QString::number((int)leftTime%60));
+    //barStatus->setTextVisible(true);
+    long tmpValue = (totalValue - leftTime);
+    barStatus->setValue(tmpValue);
+
 }
 void MainWindow::statusMeasure(DeviceTester::Measure data)
 {

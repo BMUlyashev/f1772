@@ -27,7 +27,7 @@ signals:
     void statusPreparation(int);
     void finished();
     void measure(DeviceTester::Measure);
-    void statusStepProgress(int);
+    void statusStepProgress(int, int);
     void statusFail();
 
     void closeSerial();
@@ -44,6 +44,8 @@ private:
 //    QTimer *m_timerCheck;
     double m_totalTime;    // time for progress on chanel
     QEventLoop loop;
+    long totalTime;
+    double leftTime;  //  Время которое осталось
 };
 
 #endif // WORKER_H

@@ -61,7 +61,7 @@ public slots:
     void closeSerial();
     bool openSerial();
 private slots:
-
+        void handleReadyRead();
 private:
     QSerialPort m_deviceTester;
     QByteArray m_response;
@@ -109,6 +109,9 @@ private:
     QByteArray writeAndRead(QString command, int timeout);
     void writeCommand(QString command, int timeout);
     void setSignalFunction(QString function);
+    QByteArray m_readData;
+
+
 
 };
 Q_DECLARE_METATYPE(DeviceTester::Measure);

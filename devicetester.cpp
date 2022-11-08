@@ -12,7 +12,15 @@ DeviceTester::DeviceTester(QObject *parent) : QObject(parent)
     m_deviceTester.setBaudRate(9600);
     m_isConnected = false;
     m_function = ACW;
+    m_deviceTester.setReadBufferSize(256);
+    connect(&m_deviceTester, &QSerialPort::readyRead, this, &DeviceTester::handleReadyRead);
 }
+
+void DeviceTester::handleReadyRead()
+{
+    m_readData.append(m_deviceTester.readAll());
+}
+
 
 void DeviceTester::setPortName(QString serialPortName)
 {
@@ -51,8 +59,10 @@ QByteArray DeviceTester::writeAndRead(QString command, int timeout)
         connect(&timer, &QTimer::timeout, &loop, &QEventLoop::quit);
         timer.start(timeout);
         loop.exec();
-        m_deviceTester.waitForReadyRead(200);
-        answer = m_deviceTester.readAll();
+        //m_deviceTester.waitForReadyRead(200);
+//        answer = m_deviceTester.readAll();
+        answer = m_readData;
+        m_readData.clear();
         if (answer.isEmpty()) {
             qDebug() << "Error serial port: " << m_deviceTester.errorString();
             qDebug() << "Bytes in port" << m_deviceTester.bytesAvailable();
@@ -79,10 +89,10 @@ QByteArray DeviceTester::writeAndRead(QString command, int timeout)
 
 bool DeviceTester::deviceReadInfo(QByteArray &answer)
 {
-    answer = writeAndRead(COMMAND_READ_INFO_TESTER, 100);
+    answer = writeAndRead(COMMAND_READ_INFO_TESTER, 250);
     qDebug() <<  " -> " << answer;
     QStringList data = QString(answer).split(',');
-    if (data.length() >= 1)
+    if (data.length() >= 2)
     {
         m_deviceName = data[0];
         m_deviceSerialNumber = data[1];
@@ -144,7 +154,7 @@ bool DeviceTester::setFunction(QString function)
         writeCommand(COMMAND_SET_FUNC_TESTER.arg(function), 10);
         // check to enable the command
         qDebug() <<  "Device Tester -> " << COMMAND_READ_FUNC_TESTER;
-        QByteArray answer = writeAndRead(COMMAND_READ_FUNC_TESTER, 100);
+        QByteArray answer = writeAndRead(COMMAND_READ_FUNC_TESTER, 250);
         qDebug() << QString(answer);
         if (QString(answer) == (function + "\r\n")){
             qDebug() << "Success.";
@@ -167,7 +177,7 @@ bool DeviceTester::setRampTime(QString time)
         writeCommand(COMMAND_SET_RTIME_TESTER.arg(time), 10);
         // check to enable the command
         qDebug() <<  "Device Tester -> " << COMMAND_READ_RTIME_TESTER;
-        QByteArray answer = writeAndRead(COMMAND_READ_RTIME_TESTER, 100);
+        QByteArray answer = writeAndRead(COMMAND_READ_RTIME_TESTER, 250);
         qDebug() << QString(answer);    // answer chould be 000.0 S, but time is 10.2
         QString formatAnswer = QString("%1").arg(time.toDouble(), 5, 'f', 1, '0');
         if (QString(answer) == (formatAnswer + " S\r\n")){
@@ -192,12 +202,12 @@ bool DeviceTester::setTimer(QString time, QString typeSignal)
         if (typeSignal == "DCW"){
             writeCommand(COMMAND_SET_TTIME_DCW_TESTER.arg(time), 10);
             qDebug() <<  "Device Tester -> " << COMMAND_READ_TTIME_DCW_TESTER;
-            answer = writeAndRead(COMMAND_READ_TTIME_DCW_TESTER, 100);
+            answer = writeAndRead(COMMAND_READ_TTIME_DCW_TESTER, 250);
         }
         else {
             writeCommand(COMMAND_SET_TTIME_ACW_TESTER.arg(time), 10);
             qDebug() <<  "Device Tester -> " << COMMAND_READ_TTIME_ACW_TESTER;
-            answer = writeAndRead(COMMAND_READ_TTIME_ACW_TESTER, 100);
+            answer = writeAndRead(COMMAND_READ_TTIME_ACW_TESTER, 250);
         }// check to enable the command
         qDebug() << QString(answer);    // answer chould be 000.0 S, but time is 10.2
         QString formatAnswer = QString("%1").arg(time.toDouble(), 5, 'f', 1, '0');
@@ -232,7 +242,7 @@ int DeviceTester::setFrequencyForACW(QString frequency)
         QByteArray answer;
         writeCommand(COMMAND_SET_FREQ_TESTER.arg(frequency), 10);
         qDebug() <<  "Device Tester -> " << COMMAND_READ_FREQ_TESTER;
-        answer = writeAndRead(COMMAND_READ_FREQ_TESTER, 100);
+        answer = writeAndRead(COMMAND_READ_FREQ_TESTER, 250);
         qDebug() << QString(answer);
         if (QString(answer) == (QString("%1 Hz\r\n").arg(frequency))){
             qDebug() << "Success!";
@@ -259,12 +269,12 @@ int DeviceTester::setLowCurrent(QString currentValue, QString typeSignal)
         if (typeSignal == "DCW"){
             writeCommand(COMMAND_SET_LCUR_DCW_TESTER.arg(currentValue), 10);
             qDebug() <<  "Device Tester -> " << COMMAND_READ_LCUR_DCW_TESTER;
-            answer = writeAndRead(COMMAND_READ_LCUR_DCW_TESTER, 100);
+            answer = writeAndRead(COMMAND_READ_LCUR_DCW_TESTER, 250);
         }
         else {
             writeCommand(COMMAND_SET_LCUR_ACW_TESTER.arg(currentValue), 10);
             qDebug() <<  "Device Tester -> " << COMMAND_READ_LCUR_ACW_TESTER;
-            answer = writeAndRead(COMMAND_READ_LCUR_ACW_TESTER, 100);
+            answer = writeAndRead(COMMAND_READ_LCUR_ACW_TESTER, 250);
         }// check to enable the command
         qDebug() << QString(answer);    // answer chould be 0.000mA, but time is 10.2
         QStringList value = QString(answer).split('m');
@@ -296,12 +306,12 @@ int DeviceTester::setHiCurrent(QString currentValue, QString typeSignal)
         if (typeSignal == "DCW"){
             writeCommand(COMMAND_SET_HCUR_DCW_TESTER.arg(currentValue), 10);
             qDebug() <<  "Device Tester -> " << COMMAND_READ_HCUR_DCW_TESTER;
-            answer = writeAndRead(COMMAND_READ_HCUR_DCW_TESTER, 100);
+            answer = writeAndRead(COMMAND_READ_HCUR_DCW_TESTER, 250);
         }
         else {
             writeCommand(COMMAND_SET_HCUR_ACW_TESTER.arg(currentValue), 10);
             qDebug() <<  "Device Tester -> " << COMMAND_READ_HCUR_ACW_TESTER;
-            answer = writeAndRead(COMMAND_READ_HCUR_ACW_TESTER, 100);
+            answer = writeAndRead(COMMAND_READ_HCUR_ACW_TESTER, 250);
         }// check to enable the command
         qDebug() << QString(answer);    // answer chould be 0.000mA, but time is 10.2
         QStringList value = QString(answer).split('m');
@@ -333,12 +343,12 @@ int DeviceTester::setVoltage(QString voltageValue, QString typeSignal)
         if (typeSignal == "DCW"){
             writeCommand(COMMAND_SET_VOLT_DCW_TESTER.arg(voltageValue), 10);
             qDebug() <<  "Device Tester -> " << COMMAND_READ_VOLT_DCW_TESTER;
-            answer = writeAndRead(COMMAND_READ_VOLT_DCW_TESTER, 100);
+            answer = writeAndRead(COMMAND_READ_VOLT_DCW_TESTER, 250);
         }
         else {
             writeCommand(COMMAND_SET_VOLT_ACW_TESTER.arg(voltageValue), 10);
             qDebug() <<  "Device Tester -> " << COMMAND_READ_VOLT_ACW_TESTER;
-            answer = writeAndRead(COMMAND_READ_VOLT_ACW_TESTER, 100);
+            answer = writeAndRead(COMMAND_READ_VOLT_ACW_TESTER, 250);
         }// check to enable the command
         qDebug() << QString(answer);    // answer chould be 0.000mA, but time is 10.2
         QStringList value = QString(answer).split('k');
@@ -364,7 +374,7 @@ int DeviceTester::readMeasure(Measure *tester)
     int status = NO_ERROR;
     if(m_isConnected){
         QByteArray answer;
-        answer = writeAndRead(COMMAND_READ_STAUS_TESTER, 200);
+        answer = writeAndRead(COMMAND_READ_STAUS_TESTER, 250);
         qDebug() << QString(answer);
         // parse answer
         QStringList list = QString(answer).split(',');
@@ -377,8 +387,9 @@ int DeviceTester::readMeasure(Measure *tester)
             tester->currentValue = list.at(3);
             tester->time = list.at(4);
         } else {
-            qDebug() << "Fail.";
+
             status = WRONG_ANSWER;
+            qDebug() << "Fail. " << "answer.length = " << list.length();
         }
     } else {
         qDebug() << "Not connected";
@@ -405,8 +416,8 @@ int DeviceTester::startTesting(bool enable)
             m_answer = "OFF\r\n";
         }// check to enable the command
         qDebug() <<  "Device Tester -> " << COMMAND_READ_TESTER;
-        this->thread()->msleep(200);
-        answer = writeAndRead(COMMAND_READ_TESTER, 200);
+        //this->thread()->msleep(200);
+        answer = writeAndRead(COMMAND_READ_TESTER, 500);
         qDebug() << QString(answer);    // answer chould be 0.000mA, but time is 10.2
         QStringList value = QString(answer).split(' ');
         if (value.length() == 2)
